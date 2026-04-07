@@ -1,5 +1,6 @@
 using UnityEngine;
 using Sirenix.OdinInspector;
+using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 
 namespace ProceduralDungeon.Settings
@@ -62,10 +63,10 @@ namespace ProceduralDungeon.Settings
         private TileBase floorTile; 
         
         [FoldoutGroup("Tile References")] [SerializeField]
-        private TileBase corridorTile;
+        private TileBase trapTile;
         
         [FoldoutGroup("Tile References")] [SerializeField]
-        private TileBase DecorativeTile; //To be changed and extended further depending on decorations
+        private TileBase decorativeTile; //To be changed and extended further depending on decorations
         
         /// <summary>
         ///  Public Properties
@@ -82,7 +83,7 @@ namespace ProceduralDungeon.Settings
         public int Seed => seed;
         public TileBase WallTile => wallTile;
         public TileBase FloorTile => floorTile;
-        public TileBase CorridorTile => corridorTile;
-        public TileBase DecoraticeTile => DecorativeTile; //To be changed and extended further depending on decorations
+        public TileBase CorridorTile => trapTile;
+        public TileBase DecoraticeTile => decorativeTile; //To be changed and extended further depending on decorations
     }
 }

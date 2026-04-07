@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using NUnit.Framework;
 using ProceduralDungeon.Settings;
 using Sirenix.OdinInspector;
 using UnityEngine.Tilemaps;
@@ -10,7 +11,10 @@ namespace ProceduralDungeon.Generator
     public class DungeonGenerator : MonoBehaviour
     {
         [SerializeField] private DungeonSettings dungeonSettings;
-        [SerializeField] private Tilemap dungeonTilemap;
+        [SerializeField] private Tilemap floorTileMap;
+        [SerializeField] private Tilemap wallTileMap;
+        [SerializeField] private Tilemap trapTileMap;
+        [SerializeField] private Tilemap decorationTileMap;
 
         [System.Serializable]
         private struct Room
@@ -41,7 +45,10 @@ namespace ProceduralDungeon.Generator
         [Button("Generate Dungeon")]
         public void GenerateDungeon()
         {
-            dungeonTilemap.ClearAllTiles();
+            floorTileMap.ClearAllTiles();
+            wallTileMap.ClearAllTiles();
+            decorationTileMap.ClearAllTiles();
+            trapTileMap.ClearAllTiles();
 
             List<Room> rooms = GenerateRooms();
             Debug.Log($"Generated {rooms.Count} rooms");
@@ -54,10 +61,13 @@ namespace ProceduralDungeon.Generator
         [Button("Reset Dungeon")]
         public void ResetDungeon()
         {
-            if (dungeonTilemap != null)
+            if (floorTileMap != null || wallTileMap != null|| trapTileMap != null|| decorationTileMap != null) 
             {
                 Debug.Log("Reset Dungeon");
-                dungeonTilemap.ClearAllTiles();
+                floorTileMap.ClearAllTiles();
+                wallTileMap.ClearAllTiles();
+                decorationTileMap.ClearAllTiles();
+                trapTileMap.ClearAllTiles();
             }
             else
             {
@@ -155,7 +165,7 @@ namespace ProceduralDungeon.Generator
         private void PaintDungeonTiles(List<Room> rooms)
         {
             bool[,] created = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
-
+            bool[,] isRoomTile = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
             bool[,] isMainFloor = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
 
             foreach (Room room in rooms)
@@ -168,7 +178,38 @@ namespace ProceduralDungeon.Generator
                         {
                             created[x, y] = true;
                             isMainFloor[x, y] = true;
+                            isRoomTile[x, y] = true;
                         }
+                    }
+                }
+
+                for (int x = room.x; x < room.x + room.width; x++)
+                {
+                    if (room.y >= 0 && room.y < dungeonSettings.DungeonHeight)
+                    {
+                        created[x, room.y] = true;
+                        isRoomTile[x, room.y] = true;
+                    }
+
+                    if (room.y + room.height - 1 >= 0 && room.y + room.height - 1 < dungeonSettings.DungeonHeight)
+                    {
+                        created[x, room.y + room.height - 1] = true;
+                        isRoomTile[x, room.y + room.height - 1] = true;
+                    }
+                }
+
+                for (int y = room.y; y < room.y + room.height; y++)
+                {
+                    if (room.x >= 0 && room.x < dungeonSettings.DungeonWidth)
+                    {
+                        created[room.x, y] = true;
+                        isRoomTile[room.x, y] = true;
+                    }
+
+                    if (room.x + room.width - 1 >= 0 && room.x + room.width - 1 < dungeonSettings.DungeonWidth)
+                    {
+                        created[room.x + room.width - 1, y] = true;
+                        isRoomTile[room.x + room.width - 1, y] = true;
                     }
                 }
             }
@@ -185,19 +226,19 @@ namespace ProceduralDungeon.Generator
                 {
                     int yCenter = startRoom.y;
 
-                    if (yCenter - 1 >= 0)
+                    if (yCenter - 1 >= 0 && yCenter < dungeonSettings.DungeonHeight && !isRoomTile[x, yCenter -1])
                     {
                         created[x, yCenter - 1] = true;
                         isMainFloor[x, yCenter - 1] = false;
                     }
 
-                    if (yCenter >= 0 && yCenter < dungeonSettings.DungeonHeight)
+                    if (yCenter >= 0 && yCenter < dungeonSettings.DungeonHeight  && !isRoomTile[x, yCenter])
                     {
                         created[x, yCenter] = true;
                         isMainFloor[x, yCenter] = true;
                     }
 
-                    if (yCenter + 1 < dungeonSettings.DungeonHeight)
+                    if (yCenter + 1 < dungeonSettings.DungeonHeight && !isRoomTile[x, yCenter + 1])
                     {
                         created[x, yCenter + 1] = true;
                         isMainFloor[x, yCenter + 1] = false;
@@ -211,49 +252,38 @@ namespace ProceduralDungeon.Generator
                 {
                   int xCenter = endRoom.x;
 
-                  if (xCenter - 1 >= 0)
+                  if (xCenter - 1 >= 0 &&  xCenter < dungeonSettings.DungeonWidth && !isRoomTile[xCenter - 1 , y])
                   {
                       created[xCenter - 1, y] = true;
                       isMainFloor[xCenter - 1, y] = false;
                   }
 
-                  if (xCenter >= 0 && xCenter < dungeonSettings.DungeonWidth)
+                  if (xCenter >= 0 && xCenter < dungeonSettings.DungeonWidth && !isRoomTile[xCenter, y])
                   {
                       created[xCenter, y] = true;
                       isMainFloor[xCenter, y] = true;
                   }
 
-                  if (xCenter + 1 < dungeonSettings.DungeonWidth)
+                  if (xCenter + 1 < dungeonSettings.DungeonWidth && !isRoomTile[xCenter + 1, y])
                   {
                       created[xCenter + 1, y] = true;
                       isMainFloor[xCenter + 1, y] = false;
                   }
                 }
-
-                int wallTotal = 0;
-                int floorTotal = 0;
-                int corridorTotal = 0;
     
                 for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
                 {
                     for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
                     {
                         Vector3Int pos = new Vector3Int(x, y, 0);
-
-                        if (!created[x, y])
+                        
+                        if (isMainFloor[x, y])
                         {
-                            dungeonTilemap.SetTile(pos,dungeonSettings.WallTile);
-                            wallTotal++;
+                            floorTileMap.SetTile(pos,dungeonSettings.FloorTile);
                         }
-                        else if (isMainFloor[x, y])
+                        else if (created[x, y])
                         {
-                            dungeonTilemap.SetTile(pos,dungeonSettings.FloorTile);
-                            floorTotal++;
-                        }
-                        else
-                        {
-                            dungeonTilemap.SetTile(pos,dungeonSettings.CorridorTile);
-                            corridorTotal++;
+                            floorTileMap.SetTile(pos,dungeonSettings.WallTile);
                         }
                     }
                 }
