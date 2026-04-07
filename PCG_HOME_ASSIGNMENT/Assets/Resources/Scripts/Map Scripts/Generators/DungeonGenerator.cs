@@ -164,8 +164,11 @@ namespace ProceduralDungeon.Generator
                 {
                     for (int y = room.y; y < room.y + room.height; y++)
                     {
-                        created[x, y] = true;
-                        isMainFloor[x, y] = true;
+                        if (x >= 0 && x < dungeonSettings.DungeonWidth && y >= 0 && y < dungeonSettings.DungeonHeight)
+                        {
+                            created[x, y] = true;
+                            isMainFloor[x, y] = true;
+                        }
                     }
                 }
             }
@@ -180,16 +183,25 @@ namespace ProceduralDungeon.Generator
 
                 for (int x = xMin; x <= xMax; x++)
                 {
-                    int yCenter = startRoom.y + x;
+                    int yCenter = startRoom.y;
 
-                    created[x, yCenter - 1] = true;
-                    isMainFloor[x, yCenter - 1] = false;
-                    
-                    created[x, yCenter] = true;
-                    isMainFloor[x, yCenter] = true;
-                    
-                    created[x, yCenter + 1] = true;
-                    isMainFloor[x, yCenter + 1] = false;
+                    if (yCenter - 1 >= 0)
+                    {
+                        created[x, yCenter - 1] = true;
+                        isMainFloor[x, yCenter - 1] = false;
+                    }
+
+                    if (yCenter >= 0 && yCenter < dungeonSettings.DungeonHeight)
+                    {
+                        created[x, yCenter] = true;
+                        isMainFloor[x, yCenter] = true;
+                    }
+
+                    if (yCenter + 1 < dungeonSettings.DungeonHeight)
+                    {
+                        created[x, yCenter + 1] = true;
+                        isMainFloor[x, yCenter + 1] = false;
+                    }
                 }
 
                 int yMin = Mathf.Min(startRoom.y, endRoom.y);
@@ -198,16 +210,29 @@ namespace ProceduralDungeon.Generator
                 for (int y = yMin; y <= yMax; y++)
                 {
                   int xCenter = endRoom.x;
-                  
-                  created[xCenter - 1, y] = true;
-                  isMainFloor[xCenter - 1, y] = false;
-                  
-                  created[xCenter, y] = true;
-                  isMainFloor[xCenter, y] = true;
-                  
-                  created[xCenter, y + 1] = true;
-                  isMainFloor[xCenter, y + 1] = false;
+
+                  if (xCenter - 1 >= 0)
+                  {
+                      created[xCenter - 1, y] = true;
+                      isMainFloor[xCenter - 1, y] = false;
+                  }
+
+                  if (xCenter >= 0 && xCenter < dungeonSettings.DungeonWidth)
+                  {
+                      created[xCenter, y] = true;
+                      isMainFloor[xCenter, y] = true;
+                  }
+
+                  if (xCenter + 1 < dungeonSettings.DungeonWidth)
+                  {
+                      created[xCenter + 1, y] = true;
+                      isMainFloor[xCenter + 1, y] = false;
+                  }
                 }
+
+                int wallTotal = 0;
+                int floorTotal = 0;
+                int corridorTotal = 0;
     
                 for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
                 {
@@ -218,10 +243,17 @@ namespace ProceduralDungeon.Generator
                         if (!created[x, y])
                         {
                             dungeonTilemap.SetTile(pos,dungeonSettings.WallTile);
+                            wallTotal++;
+                        }
+                        else if (isMainFloor[x, y])
+                        {
+                            dungeonTilemap.SetTile(pos,dungeonSettings.FloorTile);
+                            floorTotal++;
                         }
                         else
                         {
-                            dungeonTilemap.SetTile(pos,dungeonSettings.FloorTile);
+                            dungeonTilemap.SetTile(pos,dungeonSettings.CorridorTile);
+                            corridorTotal++;
                         }
                     }
                 }
