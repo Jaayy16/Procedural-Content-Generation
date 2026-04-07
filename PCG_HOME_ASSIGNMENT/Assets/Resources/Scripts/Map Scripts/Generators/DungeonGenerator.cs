@@ -179,6 +179,15 @@ namespace ProceduralDungeon.Generator
                             created[x, y] = true;
                             isMainFloor[x, y] = true;
                             isRoomTile[x, y] = true;
+
+                            if (x > room.x && x < room.x + room.width - 1 && y > room.y && y < room.y + room.height - 1)
+                            {
+                                isMainFloor[x, y] = true;
+                            }
+                            else
+                            {
+                                isMainFloor[x, y] = false;
+                            }
                         }
                     }
                 }
@@ -214,6 +223,9 @@ namespace ProceduralDungeon.Generator
                 }
             }
 
+            int corridorWidth = dungeonSettings.CorridorWidth;
+            int corridorHalf =corridorWidth / 2;
+            
             for (int i = 0; i < rooms.Count - 1; i++)
             {
                 Vector2Int startRoom = rooms[i].GetCenter();
@@ -224,24 +236,26 @@ namespace ProceduralDungeon.Generator
 
                 for (int x = xMin; x <= xMax; x++)
                 {
-                    int yCenter = startRoom.y;
-
-                    if (yCenter - 1 >= 0 && yCenter < dungeonSettings.DungeonHeight && !isRoomTile[x, yCenter -1])
+                    for (int yPadding = -corridorHalf; yPadding <= corridorHalf; yPadding++)
                     {
-                        created[x, yCenter - 1] = true;
-                        isMainFloor[x, yCenter - 1] = false;
-                    }
+                        int y = startRoom.y + yPadding;
 
-                    if (yCenter >= 0 && yCenter < dungeonSettings.DungeonHeight  && !isRoomTile[x, yCenter])
-                    {
-                        created[x, yCenter] = true;
-                        isMainFloor[x, yCenter] = true;
-                    }
+                        if (y >= 0 && y < dungeonSettings.DungeonHeight)
+                        {
+                            if (!isRoomTile[x, y])
+                            {
+                                created[x, y] = true;
 
-                    if (yCenter + 1 < dungeonSettings.DungeonHeight && !isRoomTile[x, yCenter + 1])
-                    {
-                        created[x, yCenter + 1] = true;
-                        isMainFloor[x, yCenter + 1] = false;
+                                if (yPadding == 0)
+                                {
+                                    isMainFloor[x, y] = true;
+                                }
+                                else
+                                {
+                                    isMainFloor[x, y] = false;
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -250,25 +264,22 @@ namespace ProceduralDungeon.Generator
 
                 for (int y = yMin; y <= yMax; y++)
                 {
-                  int xCenter = endRoom.x;
+                    for (int xPadding = -corridorHalf; xPadding <= corridorHalf; xPadding++)
+                    {
+                        int x = endRoom.x + xPadding;
 
-                  if (xCenter - 1 >= 0 &&  xCenter < dungeonSettings.DungeonWidth && !isRoomTile[xCenter - 1 , y])
-                  {
-                      created[xCenter - 1, y] = true;
-                      isMainFloor[xCenter - 1, y] = false;
-                  }
-
-                  if (xCenter >= 0 && xCenter < dungeonSettings.DungeonWidth && !isRoomTile[xCenter, y])
-                  {
-                      created[xCenter, y] = true;
-                      isMainFloor[xCenter, y] = true;
-                  }
-
-                  if (xCenter + 1 < dungeonSettings.DungeonWidth && !isRoomTile[xCenter + 1, y])
-                  {
-                      created[xCenter + 1, y] = true;
-                      isMainFloor[xCenter + 1, y] = false;
-                  }
+                        if (x >= 0 && x < dungeonSettings.DungeonWidth)
+                        {
+                            if (!isRoomTile[x, y])
+                            {
+                                isMainFloor[x, y] = true;
+                            }
+                            else
+                            {
+                                isMainFloor[x, y] = false;  
+                            }
+                        }
+                    }
                 }
     
                 for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
