@@ -2,171 +2,87 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 using UnityEngine.Tilemaps;
 
-namespace ProceduralPlatformer.Settings
+namespace ProceduralDungeon.Settings
 {
     [System.Serializable]
-    public class PlatformerSettings
+    public class DungeonSettings
     {
-        //Fixed Constraints
-        [FoldoutGroup("Fixed Constraints")]
-        [Tooltip("The initial seed for random level generation. Changing this will result in a different level layout.")]
-        [SerializeField]
+        
+        /// <summary>
+        /// Dungeon Generation 
+        /// </summary>
+        
+        [FoldoutGroup("Dungeon Dimensions")] [SerializeField]
+        private int dungeonWidth = 80;
+
+        [FoldoutGroup("Dungeon Dimensions")] [SerializeField]
+        private int dungeonHeight = 60;
+
+        /// <summary>
+        /// Room Generation 
+        /// </summary>
+        
+        [FoldoutGroup("Room Generation")] [SerializeField]
+        private int minRoomWidth = 5;
+
+        [FoldoutGroup("Room Generation")] [SerializeField]
+        private int maxRoomWidth = 15;
+
+        [FoldoutGroup("Room Generation")] [SerializeField]
+        private int minRoomHeight = 5;
+
+        [FoldoutGroup("Room Generation")] [SerializeField]
+        private int maxRoomHeight = 20;
+
+        [FoldoutGroup("Room Generation")] [SerializeField]
+        private int maxRooms = 20;
+
+        /// <summary>
+        /// Corridor Generation 
+        /// </summary>
+        
+        [FoldoutGroup("Corridor Generation")] [SerializeField]
+        private int corridorWidth = 5;
+
+        /// <summary>
+        /// Seed Generation 
+        /// </summary>
+        
+        [FoldoutGroup("Seed Generation")] [SerializeField]
         private int seed = 12345;
 
-        [FoldoutGroup("Fixed Constraints")]
-        [Tooltip("The width of the level in blocks. Changing this will result in a wider or narrower level.")]
-        [SerializeField]
-        private int width = 50;
+        /// <summary>
+        /// Tile Refrences 
+        /// </summary>
 
-        [FoldoutGroup("Fixed Constraints")]
-        [Tooltip("The dirt depth of the level in blocks. Changing this will result in a deeper or shallower level.")]
-        [SerializeField]
-        private int dirtDepth = 6;
-
-        [FoldoutGroup("Fixed Constraints")]
-        [Tooltip("The sky background height filler depth in blocks. Changing this will result in a taller or shorter sky background.")]
-        [SerializeField]
-        private int backgroundFillerDepth = 10;
-
-        //Randomised Contraints
-        [FoldoutGroup("Randomised Constraints")]
-        [Tooltip("Minimum surface height in blocks.")]
-        [SerializeField]
-        private int minSurfaceHeight = 5;
+        [FoldoutGroup("Tile References")] [SerializeField]
+        private TileBase wallTile;
         
-        [FoldoutGroup("Randomised Constraints")]
-        [Tooltip("Maximum surface height in blocks.")]
-        [SerializeField]
-        private int maxSurfaceHeight = 10;
-
-        [FoldoutGroup("Randomised Constraints")]
-        [Tooltip("Maximum height variation in between sections")]
-        [SerializeField]
-        private int maxHeightVariation = 1;
-
-        [FoldoutGroup("Randomised Constraints")]
-        [Tooltip("Minimum width for each section in blocks.")]
-        [SerializeField]
-        private int minSectionWidth = 3;
+        [FoldoutGroup("Tile References")] [SerializeField]
+        private TileBase floorTile; 
         
-        //Decoration Settings
+        [FoldoutGroup("Tile References")] [SerializeField]
+        private TileBase corridorTile;
         
-        [FoldoutGroup("Decoration Settings")]
-        [Tooltip("Probability of spawning a flower on the surface")]
-        [Range(0f, 0.1f)]
-        [SerializeField]
-        private float flowerSpawnChance = 0.05f;
+        [FoldoutGroup("Tile References")] [SerializeField]
+        private TileBase DecorativeTile; //To be changed and extended further depending on decorations
         
-        [FoldoutGroup("Decoration Settings")]
-        [Tooltip("Probability of spawning a bush on the surface")]
-        [Range(0f, 0.1f)]
-        [SerializeField]
-        private float bushSpawnChance = 0.05f;
+        /// <summary>
+        ///  Public Properties
+        /// <summary>
         
-        [FoldoutGroup("Decoration Settings")]
-        [Tooltip("Probability of spawning a tree on the surface")]
-        [Range(0f, 0.1f)]
-        [SerializeField]
-        private float treeSpawnChance = 0.05f;
-        
-        [FoldoutGroup("Decoration Settings")]
-        [Tooltip("Maximum number of adjacent flowers in a bunch")]
-        [SerializeField]
-        private int maxFlowerBunchCount = 3;
-        
-        //Tiles
-        [FoldoutGroup("Tile References")] 
-        [Tooltip("Tile used for grass at the top surface.")] 
-        [SerializeField]
-        private TileBase grassTile;
-        
-        [FoldoutGroup("Tile References")] 
-        [Tooltip("Tile used for grass left corner at the top surface.")] 
-        [SerializeField]
-        private TileBase grassLeftTile;
-        
-        [FoldoutGroup("Tile References")] 
-        [Tooltip("Tile used for grass right corner at the top surface.")] 
-        [SerializeField]
-        private TileBase grassRightTile;
-        
-        [FoldoutGroup("Tile References")] 
-        [Tooltip("Dirt used below the grass")] 
-        [SerializeField]
-        private TileBase dirtTile;
-        
-        [FoldoutGroup("Tile References")] 
-        [Tooltip("Water tile used to fill in an area instead of the dirt.")] 
-        [SerializeField]
-        private TileBase waterTile;
-
-        [FoldoutGroup("Tile References")] 
-        [Tooltip("Tile used to fill the sky background.")] 
-        [SerializeField]
-        private TileBase skyBackgroundTile;
-        
-        [FoldoutGroup("Tile References")] 
-        [Tooltip("Tile used for flower decoration on the surface.")] 
-        [SerializeField]
-        private TileBase flowerTile;
-        
-        [FoldoutGroup("Tile References")] 
-        [Tooltip("Tile used for bush decoration on the surface.")] 
-        [SerializeField]
-        private TileBase bushTile;
-        
-        [FoldoutGroup("Tile References")] 
-        [Tooltip("Tile used for tree decoration on the surface.")] 
-        [SerializeField]
-        private TileBase treeBottomTile;
-        
-        [FoldoutGroup("Tile References")] 
-        [Tooltip("Tile used for tree decoration on the surface.")] 
-        [SerializeField]
-        private TileBase treeTopTile;
-        
+        public int DungeonWidth  => dungeonWidth;
+        public int DungeonHeight => dungeonHeight;
+        public int MinRoomWidth => minRoomWidth;
+        public int MaxRoomWidth => maxRoomWidth;
+        public int MinRoomHeight => minRoomHeight;
+        public int MaxRoomHeight => maxRoomHeight;
+        public int MaxRooms => maxRooms;
+        public int CorridorWidth => corridorWidth;
         public int Seed => seed;
-
-        public int Width => width;
-
-        public int DirtDepth => dirtDepth;
-
-        public int BackgroundFillerDepth => backgroundFillerDepth;
-
-        public int MinSurfaceHeight => minSurfaceHeight;
-
-        public int MaxSurfaceHeight => maxSurfaceHeight;
-
-        public int MaxHeightVariation => maxHeightVariation;
-
-        public int MinSectionWidth => minSectionWidth;
-
-        public TileBase GrassTile => grassTile;
-
-        public TileBase DirtTile => dirtTile;
-
-        public TileBase SkyBackgroundTile => skyBackgroundTile;
-        
-        public TileBase GrassLeftTile => grassLeftTile;
-
-        public TileBase GrassRightTile => grassRightTile;
-
-        public TileBase WaterTile => waterTile;
-
-        public float FlowerSpawnChance => flowerSpawnChance;
-
-        public float BushSpawnChance => bushSpawnChance;
-
-        public float TreeSpawnChance => treeSpawnChance;
-
-        public int MaxFlowerBunchCount => maxFlowerBunchCount;
-
-        public TileBase FlowerTile => flowerTile;
-
-        public TileBase BushTile => bushTile;
-
-        public TileBase TreeBottomTile => treeBottomTile;
-
-        public TileBase TreeTopTile => treeTopTile;
+        public TileBase WallTile => wallTile;
+        public TileBase FloorTile => floorTile;
+        public TileBase CorridorTile => corridorTile;
+        public TileBase DecoraticeTile => DecorativeTile; //To be changed and extended further depending on decorations
     }
 }

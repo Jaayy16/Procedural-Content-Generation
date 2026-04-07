@@ -1,199 +1,217 @@
-using System.Linq;
 using UnityEngine;
-using ProceduralPlatformer.Settings;
+using System.Collections.Generic;
+using ProceduralDungeon.Settings;
 using Sirenix.OdinInspector;
 using UnityEngine.Tilemaps;
 
-namespace ProceduralPlatformer.Generators
-{ 
-    public enum TopTileType
-    {
-        Normal,
-        LeftCorner,
-        RightCorner,
-        Water
-    }
-    
+namespace ProceduralDungeon.Generator
+{
     [ExecuteAlways]
-    public class PlatformerGenerator : MonoBehaviour
+    public class DungeonGenerator : MonoBehaviour
     {
-        [SerializeField] private PlatformerSettings platformerSettings;
-        [SerializeField] private Tilemap terrainTilemap;
-        [SerializeField] private Tilemap backgroundTilemap;
-        [SerializeField] private Tilemap decorationTilemap;
+        [SerializeField] private DungeonSettings dungeonSettings;
+        [SerializeField] private Tilemap dungeonTilemap;
 
-        [Button("Generate Platformer")]
-        public void GeneratePlatformer()
+        [System.Serializable]
+        private struct Room
         {
-            //0. Reset Tilemaps
-            terrainTilemap.ClearAllTiles();
-            backgroundTilemap.ClearAllTiles();
-            decorationTilemap.ClearAllTiles();
-            
-            //1. Randomise Terrain
-            int[] heights = GenerateHeights();
-            //Debug.Log(string.Join(", ", heights));
+            public int x, y;
+            public int width, height;
 
-            //2. Check Top Tile Types
-            TopTileType[] topTileTypes = DetermineTopTileTypes(heights);
-            
-            //3. Render Terrain
-            RenderTiles(heights,topTileTypes);
-
-            //4. Render the sky background
-            RenderSkyBackground();
-            
-            //5. Render decorations (TODO)
-            RenderDecorations(heights, topTileTypes);
-        }
-
-        private void RenderDecorations(int[] heights, TopTileType[] topTileTypes)
-        {
-            System.Random RandDecorations = new System.Random(platformerSettings.Seed + 12876);
-
-            for (int x = 0; x < platformerSettings.Width; x++)
+            public Room(int x, int y, int width, int height)
             {
-                if (topTileTypes[x] == TopTileType.Normal && RandDecorations.NextDouble() < platformerSettings.FlowerSpawnChance)
-                {
-                    Vector3Int pos = new Vector3Int(x, heights[x] + 1, 0);
-                    decorationTilemap.SetTile(pos, platformerSettings.FlowerTile);
-                }
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+            }
 
-                if (topTileTypes[x] == TopTileType.Normal && RandDecorations.NextDouble() < platformerSettings.BushSpawnChance)
-                {
-                    Vector3Int pos = new Vector3Int(x, heights[x] + 1, 0);
-                    decorationTilemap.SetTile(pos, platformerSettings.BushTile);
-                }
+            public Vector2Int GetCenter()
+            {
+                return new Vector2Int(x + width / 2, y + height / 2);
+            }
 
-                if (topTileTypes[x] == TopTileType.Normal && RandDecorations.NextDouble() < platformerSettings.TreeSpawnChance)
-                {
-                    Vector3Int pos = new Vector3Int(x, heights[x] + 2, 0);
-                    decorationTilemap.SetTile(pos, platformerSettings.TreeTopTile);
-                    pos = new Vector3Int(x, heights[x] + 1, 0);
-                    decorationTilemap.SetTile(pos, platformerSettings.TreeBottomTile);
-                    
-                }
+            public bool Overlaps(Room room, int padding = 1)
+            {
+                return !(x + width + padding < room.x || room.x + room.width + padding < x ||
+                         y + height + padding < room.y || room.y + room.height + padding < y);
             }
         }
 
-        private int[] GenerateHeights()
+        [Button("Generate Dungeon")]
+        public void GenerateDungeon()
         {
-            int width = platformerSettings.Width;
-            int minSurfaceHeight = platformerSettings.MinSurfaceHeight;
-            int maxSurfaceHeight = platformerSettings.MaxSurfaceHeight;
-            int maxHeightVariation = platformerSettings.MaxHeightVariation;
-            int minSectionWidth = platformerSettings.MinSectionWidth;
+            dungeonTilemap.ClearAllTiles();
 
-
-            int[] heights = new int[width];
-            System.Random rng = new System.Random(platformerSettings.Seed);
-            int i = 0;
-
-            int currentHeight = rng.Next(minSurfaceHeight, maxSurfaceHeight+1);
-
-            while (i < width)
-            {
-                int remainingWidth = width - i;
-                int sectionWidth = (remainingWidth < minSectionWidth) ? 
-                    remainingWidth : rng.Next(minSectionWidth, Mathf.Min(minSectionWidth + 3, remainingWidth) + 1);
-                if (i > 0)
-                {
-                    int delta = rng.Next(-maxHeightVariation, maxHeightVariation + 1);
-                    currentHeight = (int) Mathf.Clamp(heights[i-1] + delta, minSurfaceHeight, maxSurfaceHeight);
-                }
-                for (int j = 0; j <sectionWidth && i < width; j++)
-                {
-                    heights[i] = currentHeight;
-                    i++;
-                }
-            }
-            return heights;
+            List<Room> rooms = GenerateRooms();
+            Debug.Log($"Generated {rooms.Count} rooms");
+            
+            GenerateCorridors(rooms);
+            
+            PaintDungeonTiles(rooms);
         }
 
-        private void RenderTiles(int[] heights, TopTileType[] topTileTypes)
+        [Button("Reset Dungeon")]
+        public void ResetDungeon()
         {
-            int width = platformerSettings.Width;
-            int dirtDepth = platformerSettings.DirtDepth;
-            TileBase grassTile = platformerSettings.GrassTile;
-            TileBase dirtTile = platformerSettings.DirtTile;
-            for (int x = 0; x < width; x++)
+            if (dungeonTilemap != null)
             {
-                int currentHeight = heights[x];
-                Vector3Int pos = new Vector3Int(x, currentHeight, 0);
-                //Rendering the top tile
-                terrainTilemap.SetTile(pos, GetTopTile(topTileTypes[x]));
-
-                //Place the dirt
-                for (int y = currentHeight - 1; y >= currentHeight - dirtDepth; y--)
-                {
-                    pos.y = y;
-                    terrainTilemap.SetTile(pos, dirtTile);
-                }
+                Debug.Log("Reset Dungeon");
+                dungeonTilemap.ClearAllTiles();
+            }
+            else
+            {
+                Debug.Log("Dungeon Tilemap is null");
             }
         }
         
-        private TopTileType[] DetermineTopTileTypes(int[] heights)
+        private List<Room> GenerateRooms()
         {
-            int width = platformerSettings.Width;
-            TopTileType[] tileTypes = new TopTileType[width];
- 
-            for (int x = 0; x < width; x++)
-            {
-                tileTypes[x] = TopTileType.Normal;
- 
-                if (x == 0 || (heights[x-1] < heights[x]))
-                {
-                    tileTypes[x] = TopTileType.LeftCorner;
-                }
-                else if ((x == width - 1) || (heights[x] > heights[x + 1]))
-                {
-                    tileTypes[x] = TopTileType.RightCorner;
-                }
-            }
-            return tileTypes;
-        }
+            List<Room> rooms = new List<Room>();
+            System.Random rng = new System.Random(dungeonSettings.Seed);
 
-        private TileBase GetTopTile(TopTileType type)
-        {
-            switch (type)
-            {
-                case TopTileType.Normal:
-                    return platformerSettings.GrassTile;
-                case TopTileType.LeftCorner:
-                    return platformerSettings.GrassLeftTile;
-                case TopTileType.RightCorner:
-                    return platformerSettings.GrassRightTile;
-                case TopTileType.Water:
-                    return platformerSettings.WaterTile;
-                default:
-                    return platformerSettings.GrassTile;
-            }
-        }
+            int atmpts = 0;
+            int maxAtmpts = 10;
 
-        private void RenderSkyBackground()
-        {
-            for (int x=0; x<platformerSettings.Width; x++)
+            while (rooms.Count < dungeonSettings.MaxRooms && atmpts < maxAtmpts)
             {
-                for (int y=platformerSettings.MinSurfaceHeight; y<(platformerSettings.BackgroundFillerDepth+platformerSettings.MaxSurfaceHeight); y++)
+                atmpts++;
+
+                int roomWidth = rng.Next(dungeonSettings.MinRoomWidth, dungeonSettings.MaxRoomWidth + 1);
+
+                int roomHeight = rng.Next(dungeonSettings.MinRoomHeight, dungeonSettings.MaxRoomHeight + 1);
+
+                int x = rng.Next(1, dungeonSettings.DungeonWidth - roomWidth - 1);
+                int y = rng.Next(1, dungeonSettings.DungeonHeight - roomHeight - 1);
+
+                Room room = new Room(x, y, roomWidth, roomHeight);
+
+                bool overlaps = false;
+
+                foreach (Room existingRoom in rooms)
                 {
-                    Vector3Int pos = new Vector3Int(x, y, 0);
-                    backgroundTilemap.SetTile(pos, platformerSettings.SkyBackgroundTile);
+                    if (room.Overlaps(existingRoom, padding: 2))
+                    {
+                        overlaps = true;
+                        break;
+                    }
+                }
+
+                if (!overlaps)
+                {
+                    rooms.Add(room);
+                    atmpts = 0;
                 }
             }
+
+            return rooms;
         }
 
-        [Button("Reset Tilemaps")]
-        public void ResetTerrain()
+        private void GenerateCorridors(List<Room> rooms)
         {
-            if (terrainTilemap == null)
+            for (int i = 0; i < rooms.Count - 1; i++)
             {
-                Debug.LogWarning("Terrain tilemap not defined.");
-                return;
+                Vector2Int startRoom = rooms[i].GetCenter();
+                Vector2Int endRoom = rooms[i + 1].GetCenter();
+
+                CreateHorizontalCorridor(startRoom.x, endRoom.x, startRoom.y);
+                CreateVerticalCorridor(startRoom.y, endRoom.y, endRoom.x);
             }
-            terrainTilemap.ClearAllTiles();
-            backgroundTilemap.ClearAllTiles();
-            decorationTilemap.ClearAllTiles();
-            Debug.Log("Tilemap reset successfully.");
+        }
+
+        private void CreateHorizontalCorridor(int xStart, int xEnd, int y)
+        {
+            int xMin = Mathf.Min(xStart, xEnd);
+            int xMax = Mathf.Max(xStart, xEnd);
+
+            for (int x = xMin; x <= xMax; x++)
+            {
+                CreateTile(x, y);
+            }
+        }
+
+        private void CreateVerticalCorridor(int yStart, int yEnd, int x)
+        {
+            int yMin = Mathf.Min(yStart, yEnd);
+            int yMax = Mathf.Max(yStart, yEnd);
+
+            for (int y = yMin; y <= yMax; y++)
+            {
+                CreateTile(x, y);
+            }
+        }
+
+        private void CreateTile(int x, int y)
+        {
+            if (x >= 0 && x < dungeonSettings.DungeonWidth && y >= 0 && y < dungeonSettings.DungeonHeight)
+            {
+            }
+        }
+
+        private void PaintDungeonTiles(List<Room> rooms)
+        {
+            bool[,] created = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
+
+            foreach (Room room in rooms)
+            {
+                for (int x = room.x; x < room.x + room.width; x++)
+                {
+                    for (int y = room.y; y < room.y + room.height; y++)
+                    {
+                        created[x, y] = true;
+                    }
+                }
+            }
+
+            for (int i = 0; i < rooms.Count - 1; i++)
+            {
+                Vector2Int startRoom = rooms[i].GetCenter();
+                Vector2Int endRoom = rooms[i + 1].GetCenter();
+
+                int xMin = Mathf.Min(startRoom.x, endRoom.x);
+                int xMax = Mathf.Max(startRoom.x, endRoom.x);
+
+                for (int width = xMin; width <= xMax; width++)
+                {
+                    int y = startRoom.y + width;
+                    if (y < dungeonSettings.DungeonHeight)
+                    {
+                        created[width, y] = true;
+                    }
+                }
+
+                int yMin = Mathf.Min(startRoom.y, endRoom.y);
+                int yMax = Mathf.Max(startRoom.y, endRoom.y);
+
+                for (int y = yMin; y <= yMax; y++)
+                {
+                    for (int width = 0; width < dungeonSettings.CorridorWidth; width++)
+                    {
+                        int x = endRoom.x + width;
+                        if (x < dungeonSettings.DungeonWidth)
+                        {
+                            created[x, y] = true;
+                        }
+                    }
+                }
+
+                for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
+                {
+                    for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
+                    {
+                        Vector3Int pos = new Vector3Int(x, y, 0);
+
+                        if (created[x, y])
+                        {
+                            dungeonTilemap.SetTile(pos, dungeonSettings.FloorTile);
+                        }
+                        else
+                        {
+                            dungeonTilemap.SetTile(pos, dungeonSettings.WallTile);
+                        }
+                    }
+                }
+            }
         }
     }
 }
