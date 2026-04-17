@@ -83,7 +83,7 @@ namespace ProceduralDungeon.Settings
         public int Seed => seed;
         public TileBase WallTile => wallTile;
         public TileBase FloorTile => floorTile;
-        public TileBase CorridorTile => trapTile;
-        public TileBase DecoraticeTile => decorativeTile; //To be changed and extended further depending on decorations
+        public TileBase TrapTile => trapTile;
+        public TileBase DecorativeTile => decorativeTile; //To be changed and extended further depending on decorations
     }
 }
