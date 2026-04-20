@@ -8,6 +8,13 @@ namespace ProceduralDungeon.Settings
     [System.Serializable]
     public class DungeonSettings
     {
+
+        public enum RoomShapes
+        {
+            Square,
+            Hexagon,
+            Circle
+        }
         
         /// <summary>
         /// Dungeon Generation 
@@ -38,6 +45,9 @@ namespace ProceduralDungeon.Settings
         [FoldoutGroup("Room Generation")] [SerializeField]
         private int maxRooms = 20;
 
+        [FoldoutGroup("Room Generation")] [SerializeField]
+        private int roomSpacing = 10;
+        
         /// <summary>
         /// Corridor Generation 
         /// </summary>
@@ -79,6 +89,7 @@ namespace ProceduralDungeon.Settings
         public int MinRoomHeight => minRoomHeight;
         public int MaxRoomHeight => maxRoomHeight;
         public int MaxRooms => maxRooms;
+        public int RoomSpacing => roomSpacing;
         public int CorridorWidth => corridorWidth;
         public int Seed => seed;
         public TileBase WallTile => wallTile;
