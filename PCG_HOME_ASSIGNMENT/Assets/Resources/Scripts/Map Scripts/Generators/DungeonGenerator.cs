@@ -554,7 +554,7 @@ namespace ProceduralDungeon.Generator
             {
                 for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
                 {
-                    combined[x, y] = isMainFloor[x, y] || isCorridorFloor[x, y];
+                    combined[x, y] = (isMainFloor[x, y]  && isRoomTile[x,y]) || isCorridorFloor[x, y];
                 }
             }
 
