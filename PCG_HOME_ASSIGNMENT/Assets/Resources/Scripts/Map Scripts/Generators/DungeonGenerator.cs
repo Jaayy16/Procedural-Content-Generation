@@ -92,7 +92,7 @@ namespace ProceduralDungeon.Generator
                 return norm <= 1f;
             }
         }
-    
+        
         [Button("Generate Dungeon")]
         public void GenerateDungeon()
         {
@@ -105,11 +105,10 @@ namespace ProceduralDungeon.Generator
             Debug.Log($"Generated {rooms.Count} rooms");
 
             GenerateCorridors(rooms);
-
-            //TODO continue updating painting login
-            bool[,] floorTiles = PaintDungeonTiles(rooms);
             
-            GenerateDecorations(rooms, floorTiles);
+            GenerateDecorations(rooms);
+
+            PaintDungeonTiles(rooms);
         }
 
         [Button("Reset Dungeon")]
@@ -264,7 +263,7 @@ namespace ProceduralDungeon.Generator
             }
         }
 
-        private void GenerateDecorations(List<Room> rooms, bool[,] floorTiles)
+        private void GenerateDecorations(List<Room> rooms)
         {
             if (!dungeonSettings.EnableDecoration || 
                 dungeonSettings.DecorationTiles == null || 
@@ -320,12 +319,12 @@ namespace ProceduralDungeon.Generator
         {
         }
 
-        private bool[,] PaintDungeonTiles(List<Room> rooms)
+        private void PaintDungeonTiles(List<Room> rooms)
         {
+            //Marks Rooms
             bool[,] created = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
             bool[,] isRoomTile = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
             bool[,] isMainFloor = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
-            bool[,] isCorridorFloor = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
 
             foreach (Room room in rooms)
             {
@@ -364,10 +363,10 @@ namespace ProceduralDungeon.Generator
                             if (!isRoomTile[x, y] && !created[x, y])
                             {
                                 bool adjToRoom = false;
-                                
-                                for (int xDeg = - 1; xDeg <= 1; xDeg++)
+
+                                for (int xDeg = -1; xDeg <= 1; xDeg++)
                                 {
-                                    for (int yDeg = - 1; yDeg <= 1; yDeg++)
+                                    for (int yDeg = -1; yDeg <= 1; yDeg++)
                                     {
                                         if (xDeg == 0 && yDeg == 0) continue;
                                         int xN = x + xDeg;
@@ -398,12 +397,14 @@ namespace ProceduralDungeon.Generator
                 }
             }
 
+            //Marks corridors
             int corridorWidth = dungeonSettings.CorridorWidth;
             int corridorHalf = corridorWidth / 2;
             int floorWidth = corridorWidth - 2;
             int floorHalf = floorWidth / 2;
 
             bool[,] corridorCreated = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
+            bool[,] isCorridorFloor = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
 
             for (int i = 0; i < rooms.Count - 1; i++)
             {
@@ -424,7 +425,7 @@ namespace ProceduralDungeon.Generator
                             bool inRoom = false;
                             foreach (Room room in rooms)
                             {
-                                if (room.IsPointInRoom(x,y) && room.IsInRoom(x, y))
+                                if (room.IsPointInRoom(x, y) && room.IsInRoom(x, y))
                                 {
                                     inRoom = true;
                                     break;
@@ -464,7 +465,7 @@ namespace ProceduralDungeon.Generator
                             bool inRoom = false;
                             foreach (Room room in rooms)
                             {
-                                if (room.IsPointInRoom(x,y) && room.IsInRoom(x, y))
+                                if (room.IsPointInRoom(x, y) && room.IsInRoom(x, y))
                                 {
                                     inRoom = true;
                                     break;
@@ -503,7 +504,7 @@ namespace ProceduralDungeon.Generator
                             for (int yDeg = -1; yDeg <= 1; yDeg++)
                             {
                                 if (xDeg == 0 && yDeg == 0) continue;
-                                
+
                                 int xNeighbour = x + xDeg;
                                 int yNeighbour = y + yDeg;
 
@@ -521,39 +522,63 @@ namespace ProceduralDungeon.Generator
                     }
                 }
             }
-            
-            for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
-            {
-                for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
-                {
-                    Vector3Int pos = new Vector3Int(x, y, 0);
 
-                    if (isMainFloor[x, y])
+            //Marks decorations
+            bool[,] isDecoration = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
+
+            foreach (Room room in rooms)
+            {
+                for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
+                {
+                    for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
                     {
-                        floorTileMap.SetTile(pos, dungeonSettings.FloorTile);
+                        if (x >= 0 && x < dungeonSettings.DungeonWidth && y >= 0 && y < dungeonSettings.DungeonHeight)
+                        {
+                            if (room.IsPointInRoom(x, y))
+                            {
+                                created[x, y] = true;
+                                isDecoration[x, y] = true;
+
+                                if (room.IsInRoom(x, y))
+                                {
+                                    isMainFloor[x, y] = true;
+                                }
+                                else
+                                {
+                                    isMainFloor[x, y] = false;
+                                }
+                            }
+                        }
                     }
-                    else if (isCorridorFloor[x, y])
+                }
+
+                //Gets all marked tiles and paints them accordingly
+                for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
+                {
+                    for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
                     {
-                        floorTileMap.SetTile(pos, dungeonSettings.FloorTile);
-                    }
-                    else if (created[x, y])
-                    {
-                        floorTileMap.SetTile(pos, dungeonSettings.WallTile);
+                        Vector3Int pos = new Vector3Int(x, y, 0);
+
+                        if (isMainFloor[x, y])
+                        {
+                            floorTileMap.SetTile(pos, dungeonSettings.FloorTile);
+                        }
+                        else if (isCorridorFloor[x, y])
+                        {
+                            floorTileMap.SetTile(pos, dungeonSettings.FloorTile);
+                        }
+                        else if (isDecoration[x, y])
+                        {
+                            decorationTileMap.SetTile(pos, dungeonSettings.FloorTile);
+                        }
+                        else if (created[x, y])
+                        {
+                            floorTileMap.SetTile(pos, dungeonSettings.WallTile);
+                        }
                     }
                 }
             }
-            
-            bool[,] floorTileData = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
-            for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
-            {
-                for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
-                {
-                    floorTileData[x, y] = isMainFloor[x, y] || isCorridorFloor[x, y];
-                }
-            }
-
-            return floorTileData;
-        }
+        }           
 
     }
 }

@@ -84,10 +84,10 @@ namespace ProceduralDungeon.Settings
         private TileBase floorTile; 
         
         [FoldoutGroup("Tile References")] [SerializeField]
-        private TileBase[] trapTile;
+        private TileBase[] trapTile = new TileBase[1];
         
         [FoldoutGroup("Tile References")] [SerializeField]
-        private TileBase[] decorationTiles;
+        private TileBase[] decorationTiles = new TileBase[1];
         
         /// <summary>
         ///  Public Properties
