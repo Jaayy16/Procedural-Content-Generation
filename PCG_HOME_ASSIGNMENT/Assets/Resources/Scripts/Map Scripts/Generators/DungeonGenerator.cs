@@ -38,7 +38,7 @@ namespace ProceduralDungeon.Generator
                 this.isEndRoom = isEndRoom;
             }
 
-            public Vector2Int GetCenter()
+            public Vector2Int GetCentre()
             {
                 return new Vector2Int(x + width / 2, y + height / 2);
             }
@@ -106,9 +106,10 @@ namespace ProceduralDungeon.Generator
 
             GenerateCorridors(rooms);
 
-            PaintDungeonTiles(rooms);
+            //TODO continue updating painting login
+            bool[,] floorTiles = PaintDungeonTiles(rooms);
             
-            GenerateDecorations
+            GenerateDecorations(rooms, floorTiles);
         }
 
         [Button("Reset Dungeon")]
@@ -187,8 +188,8 @@ namespace ProceduralDungeon.Generator
         {
             for (int i = 0; i < rooms.Count - 1; i++)
             {
-                Vector2Int startRoom = rooms[i].GetCenter();
-                Vector2Int endRoom = rooms[i + 1].GetCenter();
+                Vector2Int startRoom = rooms[i].GetCentre();
+                Vector2Int endRoom = rooms[i + 1].GetCentre();
 
                 CreateHorizontalCorridor(startRoom.x, endRoom.x, startRoom.y, rooms);
                 CreateVerticalCorridor(startRoom.y, endRoom.y, endRoom.x, rooms);
@@ -263,11 +264,63 @@ namespace ProceduralDungeon.Generator
             }
         }
 
+        private void GenerateDecorations(List<Room> rooms, bool[,] floorTiles)
+        {
+            if (!dungeonSettings.EnableDecoration || 
+                dungeonSettings.DecorationTiles == null || 
+                dungeonSettings.DecorationTiles.Length == 0)
+            {
+                return;
+            }
+            
+            System.Random rng = new System.Random(dungeonSettings.Seed + 1);
+            int decoCount = 0;
+
+            for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
+            {
+                for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
+                {
+                    if (floorTileMap.GetTile(new Vector3Int(x, y, 0)) == null) continue;
+                    
+                    if (!IsValidDecoSpot(x, y, rooms)) continue;
+
+                    if (decorationTileMap.GetTile(new Vector3Int(x, y, 0)) != null) continue;
+                    
+                    if (rng.NextDouble() < dungeonSettings.DecorationChance)
+                    {
+                        TileBase decoTile = 
+                            dungeonSettings.DecorationTiles[rng.Next(0, dungeonSettings.DecorationTiles.Length)];
+                        
+                        decorationTileMap.SetTile(new Vector3Int(x, y, 0), decoTile);
+                        decoCount++;
+                    }
+
+                }
+            }
+            Debug.Log($"Place {decoCount} decorations");
+        }
+
+        private bool IsValidDecoSpot(int x, int y, List<Room> rooms)
+        {
+            int minDist = dungeonSettings.MinDistFromCentre;
+            foreach (Room room in rooms)
+            {
+                if (room.isEndRoom || room.isSpawnRoom)
+                {
+                    Vector2Int roomCentre = room.GetCentre();
+                    float dist = Vector2Int.Distance( new Vector2Int(x, y), roomCentre);
+
+                    if (dist < minDist) return false;
+                }
+            }
+            return true;
+        }
+        
         private void CreateTile(int x, int y)
         {
         }
 
-        private void PaintDungeonTiles(List<Room> rooms)
+        private bool[,] PaintDungeonTiles(List<Room> rooms)
         {
             bool[,] created = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
             bool[,] isRoomTile = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
@@ -354,8 +407,8 @@ namespace ProceduralDungeon.Generator
 
             for (int i = 0; i < rooms.Count - 1; i++)
             {
-                Vector2Int startRoom = rooms[i].GetCenter();
-                Vector2Int endRoom = rooms[i + 1].GetCenter();
+                Vector2Int startRoom = rooms[i].GetCentre();
+                Vector2Int endRoom = rooms[i + 1].GetCentre();
 
                 int xMin = Mathf.Min(startRoom.x, endRoom.x);
                 int xMax = Mathf.Max(startRoom.x, endRoom.x);
@@ -489,6 +542,17 @@ namespace ProceduralDungeon.Generator
                     }
                 }
             }
+            
+            bool[,] floorTileData = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
+            for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
+            {
+                for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
+                {
+                    floorTileData[x, y] = isMainFloor[x, y] || isCorridorFloor[x, y];
+                }
+            }
+
+            return floorTileData;
         }
 
     }

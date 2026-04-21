@@ -8,7 +8,6 @@ namespace ProceduralDungeon.Settings
     [System.Serializable]
     public class DungeonSettings
     {
-
         public enum RoomShapes
         {
             Square,
@@ -19,10 +18,9 @@ namespace ProceduralDungeon.Settings
         /// <summary>
         /// Dungeon Generation 
         /// </summary>
-        
         [FoldoutGroup("Dungeon Dimensions")] [SerializeField]
         private int dungeonWidth = 80;
-
+        
         [FoldoutGroup("Dungeon Dimensions")] [SerializeField]
         private int dungeonHeight = 60;
 
@@ -56,6 +54,19 @@ namespace ProceduralDungeon.Settings
         private int corridorWidth = 5;
 
         /// <summary>
+        /// Decoration Settings
+        /// </summary>
+        
+        [FoldoutGroup("Decoration Generation")] [SerializeField]
+        private bool enableDecoration = true;
+        [FoldoutGroup("Decoration Generation")] [SerializeField]
+        public float spawnChance = 0.15f;
+        [FoldoutGroup("Decoration Generation")] [SerializeField]
+        private int minDistFromCentre = 2;
+        [FoldoutGroup("Decoration Generation")] [SerializeField]
+        private float decorationChance = 0.15f;
+        
+        /// <summary>
         /// Seed Generation 
         /// </summary>
         
@@ -73,10 +84,10 @@ namespace ProceduralDungeon.Settings
         private TileBase floorTile; 
         
         [FoldoutGroup("Tile References")] [SerializeField]
-        private TileBase trapTile;
+        private TileBase[] trapTile;
         
         [FoldoutGroup("Tile References")] [SerializeField]
-        private TileBase decorativeTile; //To be changed and extended further depending on decorations
+        private TileBase[] decorationTiles;
         
         /// <summary>
         ///  Public Properties
@@ -91,10 +102,14 @@ namespace ProceduralDungeon.Settings
         public int MaxRooms => maxRooms;
         public int RoomSpacing => roomSpacing;
         public int CorridorWidth => corridorWidth;
+        public bool EnableDecoration => enableDecoration;
+        public int MinDistFromCentre => minDistFromCentre;
+        public float DecorationChance => decorationChance;
         public int Seed => seed;
         public TileBase WallTile => wallTile;
         public TileBase FloorTile => floorTile;
-        public TileBase TrapTile => trapTile;
-        public TileBase DecorativeTile => decorativeTile; //To be changed and extended further depending on decorations
+        public TileBase[] TrapTile => trapTile;
+        public TileBase[] DecorationTiles => decorationTiles;
+
     }
 }

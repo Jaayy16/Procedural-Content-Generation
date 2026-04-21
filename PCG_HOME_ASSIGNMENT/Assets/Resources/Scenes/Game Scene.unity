@@ -147,7 +147,7 @@ Transform:
   m_GameObject: {fileID: 308154336}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10881,7 +10881,7 @@ Transform:
   m_GameObject: {fileID: 537901003}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -10932,7 +10932,7 @@ TilemapRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
-  m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
+  m_ChunkCullingBounds: {x: 1.09375, y: 1.21875, z: 0}
   m_MaxChunkCount: 16
   m_MaxFrameAge: 16
   m_SortOrder: 0
@@ -11272,11 +11272,18 @@ MonoBehaviour:
     maxRooms: 30
     roomSpacing: 10
     corridorWidth: 5
+    enableDecoration: 0
+    spawnChance: 0.15
+    minDistFromCentre: 2
+    decorationChance: 0.15
     seed: 12345
     wallTile: {fileID: 11400000, guid: 016334a2522cede46bab0a80273c17e4, type: 2}
     floorTile: {fileID: 11400000, guid: 2c9b39ed5a318804888f0c003ddb09a6, type: 2}
-    trapTile: {fileID: 11400000, guid: a6e228fe9638dd24b90dca36f81d7a78, type: 2}
-    decorativeTile: {fileID: 11400000, guid: d2f6014b6aaadfe43a0f1c65982cbf23, type: 2}
+    trapTile: []
+    decorationTiles:
+    - {fileID: 11400000, guid: f35e8cb824a5cb4468b383010c8cdc20, type: 2}
+    - {fileID: 11400000, guid: 11a6893b4348b944dbdf293f47084dc9, type: 2}
+    - {fileID: 11400000, guid: d2f6014b6aaadfe43a0f1c65982cbf23, type: 2}
   floorTileMap: {fileID: 466769964}
   wallTileMap: {fileID: 1078913441}
   trapTileMap: {fileID: 308154340}
