@@ -107,6 +107,8 @@ namespace ProceduralDungeon.Generator
             GenerateCorridors(rooms);
 
             PaintDungeonTiles(rooms);
+            
+            GenerateDecorations
         }
 
         [Button("Reset Dungeon")]
@@ -298,9 +300,9 @@ namespace ProceduralDungeon.Generator
                     }
                 }
 
-                for (int x = room.x - 2; x < room.x + room.width + 1; x++)
+                for (int x = room.x - 1; x < room.x + room.width + 1; x++)
                 {
-                    for (int y = room.y - 2; y < room.y + room.height + 1; y++)
+                    for (int y = room.y - 1; y < room.y + room.height + 1; y++)
                     {
                         if (x >= 0 && x < dungeonSettings.DungeonWidth &&
                             y >= 0 && y < dungeonSettings.DungeonHeight)
@@ -310,18 +312,18 @@ namespace ProceduralDungeon.Generator
                             {
                                 bool adjToRoom = false;
                                 
-                                for (int xDeg = -1; xDeg <= 1; xDeg++)
+                                for (int xDeg = - 1; xDeg <= 1; xDeg++)
                                 {
-                                    for (int yDeg = -1; yDeg <= 1; yDeg++)
+                                    for (int yDeg = - 1; yDeg <= 1; yDeg++)
                                     {
                                         if (xDeg == 0 && yDeg == 0) continue;
-                                        int xN = x + yDeg;
+                                        int xN = x + xDeg;
                                         int yN = y + yDeg;
 
-                                        if (xN == 0 && xN == dungeonSettings.DungeonWidth && yN == 0 &&
-                                            yN == dungeonSettings.DungeonHeight)
+                                        if (xN >= 0 && xN < dungeonSettings.DungeonWidth && yN >= 0 &&
+                                            yN < dungeonSettings.DungeonHeight)
                                         {
-                                            if (isRoomTile[xN, yN])
+                                            if (isRoomTile[xN, yN] && isMainFloor[xN, yN])
                                             {
                                                 adjToRoom = true;
                                                 break;
@@ -332,10 +334,9 @@ namespace ProceduralDungeon.Generator
                                     if (adjToRoom) break;
                                 }
 
-                                if (adjToRoom && !created[x, y])
+                                if (adjToRoom)
                                 {
                                     created[x, y] = true;
-                                    isRoomTile[x, y] = true;
                                     isMainFloor[x, y] = false;
                                 }
                             }
