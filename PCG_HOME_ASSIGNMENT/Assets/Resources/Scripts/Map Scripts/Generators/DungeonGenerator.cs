@@ -92,7 +92,7 @@ namespace ProceduralDungeon.Generator
                 return norm <= 1f;
             }
         }
-        
+
         [Button("Generate Dungeon")]
         public void GenerateDungeon()
         {
@@ -105,10 +105,10 @@ namespace ProceduralDungeon.Generator
             Debug.Log($"Generated {rooms.Count} rooms");
 
             GenerateCorridors(rooms);
-            
-            GenerateDecorations(rooms);
 
-            PaintDungeonTiles(rooms);
+            bool[,] tileData = PaintDungeonTiles(rooms);
+
+            GenerateDecorations(rooms, tileData);
         }
 
         [Button("Reset Dungeon")]
@@ -263,15 +263,15 @@ namespace ProceduralDungeon.Generator
             }
         }
 
-        private void GenerateDecorations(List<Room> rooms)
+        private void GenerateDecorations(List<Room> rooms, bool[,] tileData)
         {
-            if (!dungeonSettings.EnableDecoration || 
-                dungeonSettings.DecorationTiles == null || 
+            if (!dungeonSettings.EnableDecoration ||
+                dungeonSettings.DecorationTiles == null ||
                 dungeonSettings.DecorationTiles.Length == 0)
             {
                 return;
             }
-            
+
             System.Random rng = new System.Random(dungeonSettings.Seed + 1);
             int decoCount = 0;
 
@@ -279,23 +279,24 @@ namespace ProceduralDungeon.Generator
             {
                 for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
                 {
-                    if (floorTileMap.GetTile(new Vector3Int(x, y, 0)) == null) continue;
-                    
+                    if (!tileData[x, y]) continue;
+
                     if (!IsValidDecoSpot(x, y, rooms)) continue;
 
                     if (decorationTileMap.GetTile(new Vector3Int(x, y, 0)) != null) continue;
-                    
+
                     if (rng.NextDouble() < dungeonSettings.DecorationChance)
                     {
-                        TileBase decoTile = 
+                        TileBase decoTile =
                             dungeonSettings.DecorationTiles[rng.Next(0, dungeonSettings.DecorationTiles.Length)];
-                        
+
                         decorationTileMap.SetTile(new Vector3Int(x, y, 0), decoTile);
                         decoCount++;
                     }
 
                 }
             }
+
             Debug.Log($"Place {decoCount} decorations");
         }
 
@@ -307,19 +308,20 @@ namespace ProceduralDungeon.Generator
                 if (room.isEndRoom || room.isSpawnRoom)
                 {
                     Vector2Int roomCentre = room.GetCentre();
-                    float dist = Vector2Int.Distance( new Vector2Int(x, y), roomCentre);
+                    float dist = Vector2Int.Distance(new Vector2Int(x, y), roomCentre);
 
                     if (dist < minDist) return false;
                 }
             }
+
             return true;
         }
-        
+
         private void CreateTile(int x, int y)
         {
         }
 
-        private void PaintDungeonTiles(List<Room> rooms)
+        private bool[,] PaintDungeonTiles(List<Room> rooms)
         {
             //Marks Rooms
             bool[,] created = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
@@ -523,62 +525,40 @@ namespace ProceduralDungeon.Generator
                 }
             }
 
-            //Marks decorations
-            bool[,] isDecoration = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
-
-            foreach (Room room in rooms)
+            //Gets all marked tiles and paints them accordingly
+            for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
             {
-                for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
+                for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
                 {
-                    for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
-                    {
-                        if (x >= 0 && x < dungeonSettings.DungeonWidth && y >= 0 && y < dungeonSettings.DungeonHeight)
-                        {
-                            if (room.IsPointInRoom(x, y))
-                            {
-                                created[x, y] = true;
-                                isDecoration[x, y] = true;
+                    Vector3Int pos = new Vector3Int(x, y, 0);
 
-                                if (room.IsInRoom(x, y))
-                                {
-                                    isMainFloor[x, y] = true;
-                                }
-                                else
-                                {
-                                    isMainFloor[x, y] = false;
-                                }
-                            }
-                        }
+                    if (isMainFloor[x, y])
+                    {
+                        floorTileMap.SetTile(pos, dungeonSettings.FloorTile);
                     }
-                }
-
-                //Gets all marked tiles and paints them accordingly
-                for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
-                {
-                    for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
+                    else if (isCorridorFloor[x, y])
                     {
-                        Vector3Int pos = new Vector3Int(x, y, 0);
-
-                        if (isMainFloor[x, y])
-                        {
-                            floorTileMap.SetTile(pos, dungeonSettings.FloorTile);
-                        }
-                        else if (isCorridorFloor[x, y])
-                        {
-                            floorTileMap.SetTile(pos, dungeonSettings.FloorTile);
-                        }
-                        else if (isDecoration[x, y])
-                        {
-                            decorationTileMap.SetTile(pos, dungeonSettings.FloorTile);
-                        }
-                        else if (created[x, y])
-                        {
-                            floorTileMap.SetTile(pos, dungeonSettings.WallTile);
-                        }
+                        floorTileMap.SetTile(pos, dungeonSettings.FloorTile);
+                    }
+                    else if (created[x, y])
+                    {
+                        floorTileMap.SetTile(pos, dungeonSettings.WallTile);
                     }
                 }
             }
-        }           
 
+            //takes all floor tiles (corridor and room) and combines them into a boolean array to pass to generateDecorations
+            bool[,] combined = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
+
+            for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
+            {
+                for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
+                {
+                    combined[x, y] = isMainFloor[x, y] || isCorridorFloor[x, y];
+                }
+            }
+
+            return combined;
+        }
     }
 }
