@@ -1,32 +1,22 @@
 using UnityEngine;
+using ProceduralDungeon.Generator;
+using ProceduralDungeon.Player;
+using ProceduralDungeon.Settings;
+using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private Transform spawnPoint;
-    [SerializeField] private Transform endPoint;
+    [SerializeField] private GameObject playerPrefab;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        getSpawnPoint();
-        getEndPoint();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-    }
 
-    public Vector3 getSpawnPoint()
-    {
-        if (spawnPoint != null) return spawnPoint.position;
-        
-        return Vector3.zero;
-    }
-
-    public Vector3 getEndPoint()
-    {
-        if (spawnPoint != null) return spawnPoint.position;
-        return Vector3.zero;
     }
 }

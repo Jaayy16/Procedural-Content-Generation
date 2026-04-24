@@ -89,6 +89,11 @@ namespace ProceduralDungeon.Settings
         [FoldoutGroup("Tile References")] [SerializeField]
         private TileBase[] decorationTiles = new TileBase[1];
         
+        [FoldoutGroup("Tile References")] [SerializeField]
+        private TileBase spawnTile;
+        
+        [FoldoutGroup("Tile References")] [SerializeField]
+        private TileBase levelExitTile;
         /// <summary>
         ///  Public Properties
         /// <summary>
@@ -110,6 +115,8 @@ namespace ProceduralDungeon.Settings
         public TileBase FloorTile => floorTile;
         public TileBase[] TrapTile => trapTile;
         public TileBase[] DecorationTiles => decorationTiles;
+        public TileBase SpawnTile => spawnTile;
+        public TileBase LevelExitTile => levelExitTile;
 
     }
 }

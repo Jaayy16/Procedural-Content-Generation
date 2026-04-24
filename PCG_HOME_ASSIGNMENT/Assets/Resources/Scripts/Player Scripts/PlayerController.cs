@@ -3,7 +3,7 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 using UnityEngine.Tilemaps;
 
-namespace ProceduralDuneon.Player
+namespace ProceduralDungeon.Player
 {
 
     public class PlayerController : MonoBehaviour
@@ -36,6 +36,7 @@ namespace ProceduralDuneon.Player
             {
                 rb = gameObject.AddComponent<Rigidbody2D>();
             }
+            
         }
 
         // Update is called once per frame

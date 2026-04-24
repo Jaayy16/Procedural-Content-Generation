@@ -32,18 +32,9 @@ namespace ProceduralDungeon.Generator
         [FoldoutGroup("Generation")]
         [SerializeField] private Tilemap decorationTileMap;
         
-        // Prefabs for interactable's
         [FoldoutGroup("Generation")]
-        [SerializeField] private GameObject spawnPointPrefab;
+        [SerializeField] private Tilemap portalTileMap;
         
-        [FoldoutGroup("Generation")]
-        [SerializeField] private GameObject endPointPrefab;
-        
-        [FormerlySerializedAs("Grid")]
-        [FoldoutGroup("Generation")]
-        [SerializeField] private Transform gridParent;
-        
-
         // struct for rooms and all necessary aspects of it
         [System.Serializable]
         private struct Room
@@ -131,7 +122,6 @@ namespace ProceduralDungeon.Generator
             
             List<Room> rooms = GenerateRooms();
             Debug.Log($"Generated {rooms.Count} rooms");
-                
             
             GenerateCorridors(rooms);
 
@@ -156,7 +146,7 @@ namespace ProceduralDungeon.Generator
                 Debug.Log("Dungeon Tilemap is null");
             }
         }
-
+        
         //Generates rooms in a linear position to each other 
         private List<Room> GenerateRooms()
         {
@@ -570,7 +560,7 @@ namespace ProceduralDungeon.Generator
                 for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
                 {
                     Vector3Int pos = new Vector3Int(x, y, 0);
-
+                    
                     if (isMainFloor[x, y] || isCorridorFloor[x, y])
                     {
                         floorTileMap.SetTile(pos, dungeonSettings.FloorTile);
@@ -579,6 +569,21 @@ namespace ProceduralDungeon.Generator
                     {
                         wallTileMap.SetTile(pos, dungeonSettings.WallTile);
                     }
+                }
+            }
+            
+            //Places Spawn and Level Exit Tiles
+            foreach (Room room in rooms)
+            {
+                Vector3Int roomCentre = new Vector3Int(room.GetCentre().x, room.GetCentre().y, 0);
+
+                if (room.isSpawnRoom)
+                {
+                    portalTileMap.SetTile(roomCentre, dungeonSettings.SpawnTile);
+                }
+                else if (room.isEndRoom)
+                {
+                    portalTileMap.SetTile(roomCentre, dungeonSettings.LevelExitTile);
                 }
             }
 
