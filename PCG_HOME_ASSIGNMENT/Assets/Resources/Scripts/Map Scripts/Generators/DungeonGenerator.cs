@@ -4,19 +4,47 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using ProceduralDungeon.Settings;
 using Sirenix.OdinInspector;
+using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 
 namespace ProceduralDungeon.Generator
 {
     [ExecuteAlways]
     public class DungeonGenerator : MonoBehaviour
-    {
+    {   
+        [Header("Dungeon Settings")]
+        [FoldoutGroup("Settings")]
         [SerializeField] private DungeonSettings dungeonSettings;
-        [SerializeField] private Tilemap floorTileMap;
-        [SerializeField] private Tilemap wallTileMap;
-        [SerializeField] private Tilemap trapTileMap;
-        [SerializeField] private Tilemap decorationTileMap;
 
+        //Tilemaps and Settings
+        [Header("Dungeon Generation")]
+        
+        [FoldoutGroup("Generation")]
+        [SerializeField] private Tilemap floorTileMap;
+        
+        [FoldoutGroup("Generation")]
+        [SerializeField] private Tilemap wallTileMap;
+        
+        [FoldoutGroup("Generation")]
+        [SerializeField] private Tilemap trapTileMap;
+        
+        [FoldoutGroup("Generation")]
+        [SerializeField] private Tilemap decorationTileMap;
+        
+        // Prefabs for interactable's
+        [FoldoutGroup("Generation")]
+        [SerializeField] private GameObject spawnPointPrefab;
+        
+        [FoldoutGroup("Generation")]
+        [SerializeField] private GameObject endPointPrefab;
+        
+        [FormerlySerializedAs("Grid")]
+        [FoldoutGroup("Generation")]
+        [SerializeField] private Transform gridParent;
+        
+
+        // struct for rooms and all necessary aspects of it
         [System.Serializable]
         private struct Room
         {
@@ -100,14 +128,15 @@ namespace ProceduralDungeon.Generator
             wallTileMap.ClearAllTiles();
             decorationTileMap.ClearAllTiles();
             trapTileMap.ClearAllTiles();
-
+            
             List<Room> rooms = GenerateRooms();
             Debug.Log($"Generated {rooms.Count} rooms");
-
+                
+            
             GenerateCorridors(rooms);
 
             bool[,] tileData = PaintDungeonTiles(rooms);
-
+            
             GenerateDecorations(rooms, tileData);
         }
 
@@ -128,6 +157,7 @@ namespace ProceduralDungeon.Generator
             }
         }
 
+        //Generates rooms in a linear position to each other 
         private List<Room> GenerateRooms()
         {
             List<Room> rooms = new List<Room>();
@@ -172,6 +202,7 @@ namespace ProceduralDungeon.Generator
             int endH = rng.Next(dungeonSettings.MinRoomHeight, dungeonSettings.MaxRoomHeight + 1);
 
             int endX = dungeonSettings.DungeonWidth - endW - 5;
+            int endY = dungeonSettings.DungeonHeight - endH - 5;
 
             DungeonSettings.RoomShapes endShape = DungeonSettings.RoomShapes.Square;
 
@@ -183,6 +214,7 @@ namespace ProceduralDungeon.Generator
             return rooms;
         }
 
+        //Generates all the corridors for all the rooms
         private void GenerateCorridors(List<Room> rooms)
         {
             for (int i = 0; i < rooms.Count - 1; i++)
@@ -195,6 +227,7 @@ namespace ProceduralDungeon.Generator
             }
         }
 
+        //Creates the horizontal corridors
         private void CreateHorizontalCorridor(int xStart, int xEnd, int yCentre, List<Room> rooms)
         {
             int xMin = Mathf.Min(xStart, xEnd);
@@ -219,6 +252,7 @@ namespace ProceduralDungeon.Generator
             }
         }
 
+        //Creates the vertical corridors
         private void CreateVerticalCorridor(int yStart, int yEnd, int xCentre, List<Room> rooms)
         {
             int yMin = Mathf.Min(yStart, yEnd);
@@ -243,6 +277,7 @@ namespace ProceduralDungeon.Generator
             }
         }
 
+        //carves out the corridors between the rooms on the grid
         private void CarveCorridor(int xCentre, int yCentre)
         {
             int corridorWidth = dungeonSettings.CorridorWidth;
@@ -263,6 +298,7 @@ namespace ProceduralDungeon.Generator
             }
         }
 
+        //Generates the decorations
         private void GenerateDecorations(List<Room> rooms, bool[,] tileData)
         {
             if (!dungeonSettings.EnableDecoration ||
@@ -300,6 +336,7 @@ namespace ProceduralDungeon.Generator
             Debug.Log($"Place {decoCount} decorations");
         }
 
+        //Checking to see if intended spawn position for decorations is valid
         private bool IsValidDecoSpot(int x, int y, List<Room> rooms)
         {
             int minDist = dungeonSettings.MinDistFromCentre;
@@ -317,10 +354,12 @@ namespace ProceduralDungeon.Generator
             return true;
         }
 
+        //Purposefully empty to be used later in the code
         private void CreateTile(int x, int y)
         {
         }
 
+        //Paints Dungeon Tiles
         private bool[,] PaintDungeonTiles(List<Room> rooms)
         {
             //Marks Rooms
@@ -532,17 +571,13 @@ namespace ProceduralDungeon.Generator
                 {
                     Vector3Int pos = new Vector3Int(x, y, 0);
 
-                    if (isMainFloor[x, y])
-                    {
-                        floorTileMap.SetTile(pos, dungeonSettings.FloorTile);
-                    }
-                    else if (isCorridorFloor[x, y])
+                    if (isMainFloor[x, y] || isCorridorFloor[x, y])
                     {
                         floorTileMap.SetTile(pos, dungeonSettings.FloorTile);
                     }
                     else if (created[x, y])
                     {
-                        floorTileMap.SetTile(pos, dungeonSettings.WallTile);
+                        wallTileMap.SetTile(pos, dungeonSettings.WallTile);
                     }
                 }
             }
