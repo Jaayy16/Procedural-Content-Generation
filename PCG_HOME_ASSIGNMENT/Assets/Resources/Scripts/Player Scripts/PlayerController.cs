@@ -8,18 +8,21 @@ namespace ProceduralDungeon.Player
 
     public class PlayerController : MonoBehaviour
     {
-        [Header("Movement Settings")] [SerializeField, Range(0, 10)]
+        [Header("Movement Settings")] [SerializeField, Range(0, 20)]
         private float movementSpeed = 5f;
 
         [SerializeField] private float waterSlowMultiplier = 0.25f;
 
-        [Header("TileMaps")] [SerializeField] private Tilemap wallTilemap;
+        [Header("TileMaps")] 
+        [SerializeField] private Tilemap wallTilemap;
         [SerializeField] private Tilemap floorTilemap;
         [SerializeField] private Tilemap decorationTilemap;
+        [SerializeField] private Tilemap portalTilemap;
 
-        [Header("Object Detection")] [SerializeField]
-        private TileBase[] waterTiles;
-
+        [Header("Object To Detect")] 
+        [SerializeField] private TileBase[] waterTiles;
+        [SerializeField] private TileBase[] lavaTiles;
+        
         [SerializeField] private float gridCellSize = 1f;
 
         private Vector2 inputDirection;
@@ -36,13 +39,28 @@ namespace ProceduralDungeon.Player
             {
                 rb = gameObject.AddComponent<Rigidbody2D>();
             }
-            
+
+            if (wallTilemap == null)
+            {
+                wallTilemap = GameObject.Find("Walls").GetComponent<Tilemap>();
+            }
+
+            if (floorTilemap == null)
+            {
+                floorTilemap = GameObject.Find("Floor").GetComponent<Tilemap>();
+            }
+
+            if (decorationTilemap == null)
+            {
+                decorationTilemap = GameObject.Find("Decorations").GetComponent<Tilemap>();
+            }
         }
 
         // Update is called once per frame
         void Update()
         {
             inputDirection = GetInputMovement();
+            CheckIfOnExit();
         }
 
         private void FixedUpdate()
@@ -92,6 +110,25 @@ namespace ProceduralDungeon.Player
             return true;
         }
 
+        private void CheckIfOnExit()
+        {
+            if (portalTilemap == null) return;
+
+            Vector3Int playerCell = portalTilemap.WorldToCell(transform.position);
+            TileBase tile = portalTilemap.GetTile(playerCell);
+
+            if (tile != null)
+            {
+                OnExitReached(tile);
+            }
+        }
+
+        private void OnExitReached(TileBase tile)
+        {
+            //For now it will quit the application
+            Application.Quit();
+        }
+        
         private void CheckWaterStatus()
         {
             Vector3Int playerCell = floorTilemap.WorldToCell(transform.position);
@@ -132,5 +169,13 @@ namespace ProceduralDungeon.Player
         }
 
         public bool GetIsOnWater() => isOnWater;
+
+        public void SetTilemaps(Tilemap Floor, Tilemap Wall, Tilemap Decoration, Tilemap portal)
+        {
+            floorTilemap = Floor;
+            wallTilemap = Wall;
+            decorationTilemap = Decoration;
+            portalTilemap = portal;
+        }
     }
 }

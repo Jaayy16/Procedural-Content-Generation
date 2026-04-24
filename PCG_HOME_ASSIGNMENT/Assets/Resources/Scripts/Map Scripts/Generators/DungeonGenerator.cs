@@ -119,6 +119,8 @@ namespace ProceduralDungeon.Generator
             wallTileMap.ClearAllTiles();
             decorationTileMap.ClearAllTiles();
             trapTileMap.ClearAllTiles();
+            portalTileMap.ClearAllTiles();
+
             
             List<Room> rooms = GenerateRooms();
             Debug.Log($"Generated {rooms.Count} rooms");
@@ -140,6 +142,7 @@ namespace ProceduralDungeon.Generator
                 wallTileMap.ClearAllTiles();
                 decorationTileMap.ClearAllTiles();
                 trapTileMap.ClearAllTiles();
+                portalTileMap.ClearAllTiles();
             }
             else
             {
@@ -196,7 +199,7 @@ namespace ProceduralDungeon.Generator
 
             DungeonSettings.RoomShapes endShape = DungeonSettings.RoomShapes.Square;
 
-            Room endRoom = new Room(endX, endH, endW, endH, endShape, false, true);
+            Room endRoom = new Room(endX, endY, endW, endH, endShape, false, true);
             rooms.Add(endRoom);
 
             Debug.Log($"End Room at {endW}x{endH}");
