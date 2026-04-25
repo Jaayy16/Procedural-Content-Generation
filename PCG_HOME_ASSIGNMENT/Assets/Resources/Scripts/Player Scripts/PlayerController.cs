@@ -117,7 +117,7 @@ namespace ProceduralDungeon.Player
             Vector3Int playerCell = portalTilemap.WorldToCell(transform.position);
             TileBase tile = portalTilemap.GetTile(playerCell);
 
-            if (tile != null)
+            if (tile != null && tile.name == "Dungeon Tileset_199")
             {
                 OnExitReached(tile);
             }
@@ -125,8 +125,9 @@ namespace ProceduralDungeon.Player
 
         private void OnExitReached(TileBase tile)
         {
-            //For now it will quit the application
+            //For now, it will quit the application
             Application.Quit();
+            Debug.Log("Exit Reached");
         }
         
         private void CheckWaterStatus()

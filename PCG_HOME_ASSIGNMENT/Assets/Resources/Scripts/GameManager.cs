@@ -59,7 +59,7 @@ public class GameManager : MonoBehaviour
 
         BoundsInt bounds = portalTileMap.cellBounds;
         Vector3 spawnWorldPos = Vector3.zero;
-        bool foundSpwan = false;
+        bool foundSpawn = false;
         
         foreach (Vector3Int pos in bounds.allPositionsWithin)
         {
@@ -68,12 +68,12 @@ public class GameManager : MonoBehaviour
             if (tile == dungeonSettings.SpawnTile)
             {
                 spawnWorldPos += portalTileMap.CellToWorld(pos) + new Vector3(0.5f, 0.5f, 0f);
-                foundSpwan = true;
+                foundSpawn = true;
                 break;
             }
         }
 
-        if (!foundSpwan)
+        if (!foundSpawn)
         {
             Debug.LogError("No Spawn tile found!");
             return null;

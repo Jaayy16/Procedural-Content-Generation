@@ -17,6 +17,8 @@ namespace ProceduralDungeon.Generator
         [FoldoutGroup("Settings")]
         [SerializeField] private DungeonSettings dungeonSettings;
 
+        private TileVarianceGenerator varianceGenerator;
+        
         //Tilemaps and Settings
         [Header("Dungeon Generation")]
         
@@ -121,6 +123,7 @@ namespace ProceduralDungeon.Generator
             trapTileMap.ClearAllTiles();
             portalTileMap.ClearAllTiles();
 
+            varianceGenerator = new TileVarianceGenerator(dungeonSettings, dungeonSettings.Seed);
             
             List<Room> rooms = GenerateRooms();
             Debug.Log($"Generated {rooms.Count} rooms");
@@ -355,11 +358,14 @@ namespace ProceduralDungeon.Generator
         //Paints Dungeon Tiles
         private bool[,] PaintDungeonTiles(List<Room> rooms)
         {
+
+            TileVarianceGenerator varianceGenerator = new TileVarianceGenerator(dungeonSettings, dungeonSettings.Seed);
+            
             //Marks Rooms
             bool[,] created = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
             bool[,] isRoomTile = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
             bool[,] isMainFloor = new bool[dungeonSettings.DungeonWidth, dungeonSettings.DungeonHeight];
-
+            
             foreach (Room room in rooms)
             {
                 for (int x = room.x - 1; x < room.x + room.width; x++)
@@ -557,20 +563,32 @@ namespace ProceduralDungeon.Generator
                 }
             }
 
-            //Gets all marked tiles and paints them accordingly
+            //Paint All Wall Tiles
             for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
             {
                 for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
                 {
                     Vector3Int pos = new Vector3Int(x, y, 0);
                     
+                    if (created[x, y] && !isMainFloor[x, y] && !isCorridorFloor[x, y])
+                    {
+                        TileBase wallTile = varianceGenerator.GetWallVariant(x, y, dungeonSettings.WallTile);
+                        wallTileMap.SetTile(pos, wallTile);
+                    }
+                }
+            }
+
+            //Paint All Floor Tiles
+            for (int x = 0; x < dungeonSettings.DungeonWidth; x++)
+            {
+                for (int y = 0; y < dungeonSettings.DungeonHeight; y++)
+                {
+                    Vector3Int pos = new Vector3Int(x, y, 0);
+
                     if (isMainFloor[x, y] || isCorridorFloor[x, y])
                     {
-                        floorTileMap.SetTile(pos, dungeonSettings.FloorTile);
-                    }
-                    else if (created[x, y])
-                    {
-                        wallTileMap.SetTile(pos, dungeonSettings.WallTile);
+                       TileBase floorTile = varianceGenerator.GetFloorVariant(x, y, dungeonSettings.FloorTile);
+                       floorTileMap.SetTile(pos, floorTile); 
                     }
                 }
             }
