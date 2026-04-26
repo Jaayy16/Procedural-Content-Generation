@@ -51,7 +51,14 @@ namespace ProceduralDungeon.Generator
                     
                 varIndex= Mathf.Clamp(varIndex, 0, dungeonSettings.FloorVariants.Length - 1);
                 
-                return dungeonSettings.FloorVariants[varIndex];
+                TileBase variant = dungeonSettings.FloorVariants[varIndex];
+
+                if (x < 5 & y < 5)
+                {
+                    Debug.Log($"Wall variant at({x}, {y}): {variant.name}");
+                }
+                
+                return variant;
             }
             return tile;
         }
@@ -73,7 +80,14 @@ namespace ProceduralDungeon.Generator
 
                 varIndex = Mathf.Clamp(varIndex, 0, dungeonSettings.FloorVariants.Length - 1);
                 
-                return dungeonSettings.FloorVariants[varIndex];
+                TileBase variant = dungeonSettings.WallVariants[varIndex];
+
+                if (x < 5 & y < 5)
+                {
+                    Debug.Log($"Wall variant at({x}, {y}): {variant.name}");
+                }
+                
+                return variant;
             }
             return tile;
         }
