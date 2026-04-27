@@ -1,6 +1,8 @@
 using System;
+using ProceduralDungeon.Generator;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
 namespace ProceduralDungeon.Player
@@ -18,18 +20,28 @@ namespace ProceduralDungeon.Player
         [SerializeField] private Tilemap floorTilemap;
         [SerializeField] private Tilemap decorationTilemap;
         [SerializeField] private Tilemap portalTilemap;
+        [SerializeField] private Tilemap biomeTileMap;
 
         [Header("Object To Detect")] 
         [SerializeField] private TileBase[] waterTiles;
         [SerializeField] private TileBase[] lavaTiles;
-        
+                
+        [Header("Lava Settings")] [SerializeField , Range(0,5)]
+        private float lavaDmgPerSecond =1f;
+                
         [SerializeField] private float gridCellSize = 1f;
-
+        
         private Vector2 inputDirection;
         private Rigidbody2D rb;
         private float currentSpeed;
+        
         private bool isOnWater = false;
-
+        private bool isOnLava = false;
+        private float lavaDmgTimer = 0f;
+        private BiomeType currentBiome = BiomeType.Normal;
+        
+        private float playerHealth = 100f;
+        
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -62,25 +74,28 @@ namespace ProceduralDungeon.Player
             inputDirection = GetInputMovement();
             CheckIfOnExit();
         }
-
+              
         private void FixedUpdate()
-        {
-            if (rb == null) return;
-
-            Vector2 dir = rb.position + inputDirection * movementSpeed * Time.fixedDeltaTime;
-            
-            if (CanMoveTo(dir))
-            {
-                rb.linearVelocity = inputDirection * GetCurrentSpeed();
-            }
-            else
-            {
-                rb.linearVelocity = Vector2.zero;
-            }
-
-            CheckWaterStatus();
-        }
-
+              {
+                  if (rb == null) return;
+      
+                  Vector2 dir = rb.position + inputDirection * movementSpeed * Time.fixedDeltaTime;
+                  
+                  if (CanMoveTo(dir))
+                  {
+                      rb.linearVelocity = inputDirection * GetCurrentSpeed();
+                  }
+                  else
+                  {
+                      rb.linearVelocity = Vector2.zero;
+                  }
+      
+                  CheckWaterStatus();
+                  CheckLavaStatus();
+                  ApplyLavaDamage();
+              }
+                
+        //Movements functions
         private Vector2 GetInputMovement()
         {
            Vector2 input = Vector2.zero;
@@ -110,6 +125,7 @@ namespace ProceduralDungeon.Player
             return true;
         }
 
+        //Checks if player is able to leave the current dungeon
         private void CheckIfOnExit()
         {
             if (portalTilemap == null) return;
@@ -130,12 +146,13 @@ namespace ProceduralDungeon.Player
             Debug.Log("Exit Reached");
         }
         
+        //Applies water slowness
         private void CheckWaterStatus()
         {
             Vector3Int playerCell = floorTilemap.WorldToCell(transform.position);
             isOnWater = false;
             
-            TileBase tile = decorationTilemap.GetTile(playerCell);
+            TileBase tile = biomeTileMap.GetTile(playerCell);
 
             if (tile != null && isWaterTile(tile))
             {
@@ -168,15 +185,116 @@ namespace ProceduralDungeon.Player
             
             return false;
         }
+        
+        //Applies lava Damage
+        private void CheckLavaStatus()
+        {
+            Vector3Int playerCell = floorTilemap.WorldToCell(transform.position);
+            isOnLava = false;
 
-        public bool GetIsOnWater() => isOnWater;
+            TileBase tile = biomeTileMap.GetTile(playerCell);
+            
+            if(tile != null && isLavaTile(tile))
+            {
+                isOnLava = true;
+                return;
+            }
 
-        public void SetTilemaps(Tilemap Floor, Tilemap Wall, Tilemap Decoration, Tilemap portal)
+            tile = floorTilemap.GetTile(playerCell);
+            if (tile != null && isLavaTile(tile))
+            {
+                isOnLava = true;
+                return;
+            }
+        }
+
+        private bool isLavaTile(TileBase tile)
+        {
+            if(tile == null || lavaTiles == null) return false;
+
+            foreach (TileBase lavaTile in lavaTiles)
+            {
+                if (tile == lavaTile) return true;
+            }
+            
+            return false;
+        }
+
+        private void ApplyLavaDamage()
+        {
+            if (!isOnLava)
+            {
+                lavaDmgTimer = 0f;
+                return;
+            }
+            
+            lavaDmgTimer += Time.fixedDeltaTime;
+
+            if (lavaDmgTimer >= 1f)
+            {
+                playerHealth -= lavaDmgPerSecond;
+                lavaDmgTimer = 0f;
+                Debug.Log($"Player too DMG! Health: {playerHealth}");
+
+                if (playerHealth <= 0)
+                {
+                    Die();
+                }
+            }
+            
+        }
+
+        private void Die()
+        {
+            Debug.Log("Player Died");
+            
+            Destroy(this.gameObject);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
+
+        private void UpdateBiomeStatus()
+        {
+            Vector3Int playerCell = biomeTileMap.WorldToCell(transform.position);
+            BiomeType detectedBiome = BiomeType.Normal;
+            
+            TileBase tile = biomeTileMap.GetTile(playerCell);
+
+            if (tile != null)
+            {
+                if (isLavaTile(tile))
+                {
+                    detectedBiome = BiomeType.Molten;
+                }
+                else if (isWaterTile(tile))
+                {
+                    detectedBiome = BiomeType.Flooded;
+                }
+            }
+            
+            currentBiome = detectedBiome;
+        }
+
+        public BiomeType GetCurrentBiome()
+        {
+            return currentBiome;
+        }
+        
+        public void SetTilemaps(Tilemap Floor, Tilemap Wall, Tilemap Decoration, Tilemap portal, Tilemap biome)
         {
             floorTilemap = Floor;
             wallTilemap = Wall;
             decorationTilemap = Decoration;
             portalTilemap = portal;
+            biomeTileMap = biome;
+
+            if (portal != null)
+            {
+                portalTilemap = portal;
+            }
+
         }
+    
+        public bool GetIsOnWater() => isOnWater;
+        public bool GetIsOnLava() => isOnLava;
     }
 }

@@ -10,11 +10,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Camera mainCamera; 
     [SerializeField] private GameObject playerPrefab;
     
-    [SerializeField]  Tilemap portalTileMap;
+    [SerializeField] Tilemap portalTileMap;
     [SerializeField] Tilemap floorTilemap;
     [SerializeField] Tilemap wallTilemap;
-    [SerializeField] private Tilemap decorationTilemap;
-    [SerializeField] private Tilemap trapTilemap;
+    [SerializeField] Tilemap decorationTilemap;
+    [SerializeField] Tilemap trapTilemap;
+    [SerializeField] Tilemap biomeTileMap;
     
     [SerializeField] private DungeonGenerator dungeonGenerator;
     [SerializeField] private DungeonSettings dungeonSettings;
@@ -85,7 +86,7 @@ public class GameManager : MonoBehaviour
 
         if (playerController != null)
         {
-            playerController.SetTilemaps(floorTilemap, wallTilemap, decorationTilemap, portalTileMap);
+            playerController.SetTilemaps(floorTilemap, wallTilemap, decorationTilemap, portalTileMap, biomeTileMap);
         }
         else
         {

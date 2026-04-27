@@ -180,6 +180,8 @@ MonoBehaviour:
   wallTilemap: {fileID: 0}
   floorTilemap: {fileID: 0}
   decorationTilemap: {fileID: 0}
+  portalTilemap: {fileID: 0}
+  biomeTileMap: {fileID: 0}
   waterTiles:
   - {fileID: 11400000, guid: 345a1ac6ec0095a47a0f9c3e9eb7d4c7, type: 2}
   - {fileID: 11400000, guid: 02192ec0af27a404e9037c4b4dfc4e8a, type: 2}
@@ -204,4 +206,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e5464539055c169418ce8d61d62209d6, type: 2}
   - {fileID: 11400000, guid: 9a698687994e2a54e853e605c78dc93d, type: 2}
   - {fileID: 11400000, guid: fd2ce1c88b0b81a49b1cecbb479c8244, type: 2}
+  lavaDmgPerSecond: 5
   gridCellSize: 1

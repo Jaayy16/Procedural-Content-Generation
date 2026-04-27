@@ -95,6 +95,25 @@ namespace ProceduralDungeon.Settings
         [FoldoutGroup("Tile Variance")] [SerializeField, Range(0, 1)]
         private float varianceThreshold = 0.5f;
         
+        ///<summary>
+        ///Biome Settings
+        /// </summary>
+        
+        [FoldoutGroup("Biome Settings")] [SerializeField]
+        private bool enableBiomes = true;
+
+        [FoldoutGroup("Biome Settings")] [SerializeField]
+        private float floodChance = 0.4f;
+        
+        [FoldoutGroup("Biome Settings")] [SerializeField]
+        private float moltenChance = 0.3f;
+        
+        [FoldoutGroup("Biome Settings")] [SerializeField]
+        private TileBase[] floodedTiles = new TileBase[1];
+         
+        [FoldoutGroup("Biome Settings")] [SerializeField]
+        private TileBase[] moltenTiles = new TileBase[1];
+        
         /// <summary>
         /// Tile Refrences 
         /// </summary>
@@ -141,6 +160,13 @@ namespace ProceduralDungeon.Settings
         public int MinDistFromCentre => minDistFromCentre;
         public float DecorationChance => decorationChance;
         public int Seed => seed;
+        
+        //Pass Biome Related Variables
+        public bool EnableBiomes => enableBiomes;
+        public float FloodChance => floodChance;
+        public float MoltenChance => moltenChance;
+        public TileBase[] FloodedTiles => floodedTiles;
+        public TileBase[] MoltenTiles => moltenTiles;
         
         //Pass Perlin-Noise Related Variables
         public bool EnableFloorVariance => enableFloorVariance;

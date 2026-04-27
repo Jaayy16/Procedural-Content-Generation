@@ -17,7 +17,12 @@ namespace ProceduralDungeon.Generator
         [FoldoutGroup("Settings")]
         [SerializeField] private DungeonSettings dungeonSettings;
 
+        //Perlin-noise generated call
         private TileVarianceGenerator varianceGenerator;
+        
+        //Biome Generation Call
+        private BiomeGenerator biomeGenerator;
+        private List<BiomeType> roomBiomesCache = new  List<BiomeType>();
         
         //Tilemaps and Settings
         [Header("Dungeon Generation")]
@@ -36,6 +41,9 @@ namespace ProceduralDungeon.Generator
         
         [FoldoutGroup("Generation")]
         [SerializeField] private Tilemap portalTileMap;
+        
+        [FoldoutGroup("Generation")] 
+        [SerializeField] private Tilemap biomeTileMap;
         
         // struct for rooms and all necessary aspects of it
         [System.Serializable]
@@ -122,15 +130,29 @@ namespace ProceduralDungeon.Generator
             decorationTileMap.ClearAllTiles();
             trapTileMap.ClearAllTiles();
             portalTileMap.ClearAllTiles();
+            biomeTileMap.ClearAllTiles();
 
             varianceGenerator = new TileVarianceGenerator(dungeonSettings, dungeonSettings.Seed);
+            biomeGenerator = new BiomeGenerator(dungeonSettings, dungeonSettings.Seed);
             
             List<Room> rooms = GenerateRooms();
             Debug.Log($"Generated {rooms.Count} rooms");
+
+            if (dungeonSettings.EnableBiomes)
+            {
+                biomeGenerator.AssignBiome(rooms.Count);
+                CacheRoomBiomes(rooms);
+            }
             
             GenerateCorridors(rooms);
 
             bool[,] tileData = PaintDungeonTiles(rooms);
+
+            if (dungeonSettings.EnableBiomes)
+            {
+                ApplyRoomBiomes(rooms);
+                ApplyCorridorBiomes(rooms);
+            }
             
             GenerateDecorations(rooms, tileData);
         }
@@ -146,6 +168,7 @@ namespace ProceduralDungeon.Generator
                 decorationTileMap.ClearAllTiles();
                 trapTileMap.ClearAllTiles();
                 portalTileMap.ClearAllTiles();
+                biomeTileMap.ClearAllTiles();
             }
             else
             {
@@ -294,6 +317,70 @@ namespace ProceduralDungeon.Generator
             }
         }
 
+        //stores which rooms are assigned what biomes
+        private void CacheRoomBiomes(List<Room> rooms)
+        {
+            roomBiomesCache = new List<BiomeType>();
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                BiomeType biome = biomeGenerator.GetBiome(i);
+                roomBiomesCache.Add(biomeGenerator.GetBiome(i));
+            }
+        }
+
+        //Generates the biomes for the corresponding room
+        private void ApplyRoomBiomes(List<Room> rooms)
+        {
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                Room room = rooms[i];
+                BiomeType biome = biomeGenerator.GetBiome(i);
+                bool isSquareRoom = room.shape == DungeonSettings.RoomShapes.Square;
+                
+                
+                biomeGenerator.GenerateRoomBiome(biome, floorTileMap, biomeTileMap, room.x, room.y, room.width, room.height, isSquareRoom);
+            }
+        }
+
+        private void ApplyCorridorBiomes(List<Room> rooms)
+        {
+            if (rooms == null || rooms.Count < 2)
+            {
+                return;
+            }
+
+            System.Random corridorRNG = new System.Random(dungeonSettings.Seed + 1000);
+
+            for (int i = 0; i < rooms.Count; i++)
+            {
+
+                if (i >= roomBiomesCache.Count || i + 1 >= roomBiomesCache.Count)
+                {
+                    continue;
+                }
+                
+                Room currentRoom = rooms[i];
+                Room nextRoom = rooms[i + 1];
+                
+                Vector2Int startRoom = rooms[i].GetCentre();
+                Vector2Int endRoom = rooms[i + 1].GetCentre();
+                
+                BiomeType biome1 = biomeGenerator.GetBiome(i);
+                BiomeType biome2 = biomeGenerator.GetBiome(i + 1);
+                
+                int xMin = Mathf.Min(startRoom.x, endRoom.x);
+                int xMax = Mathf.Max(startRoom.x, endRoom.x);
+                int yMin = Mathf.Min(startRoom.y, endRoom.y);
+                int yMax = Mathf.Max(startRoom.y, endRoom.y);
+
+                biomeGenerator.BlendCorridorBiome(biome1, biome2, biomeTileMap, xMin, xMax, startRoom.y,
+                    startRoom.y, corridorRNG);
+
+                biomeGenerator.BlendCorridorBiome(biome1, biome2, biomeTileMap, endRoom.x, endRoom.x, yMin, yMax,
+                    corridorRNG);
+            }
+        }
+        
         //Generates the decorations
         private void GenerateDecorations(List<Room> rooms, bool[,] tileData)
         {
@@ -316,6 +403,8 @@ namespace ProceduralDungeon.Generator
                     if (!IsValidDecoSpot(x, y, rooms)) continue;
 
                     if (decorationTileMap.GetTile(new Vector3Int(x, y, 0)) != null) continue;
+                    
+                    if(biomeTileMap.GetTile(new Vector3Int(x, y, 0)) != null) continue;
 
                     if (rng.NextDouble() < dungeonSettings.DecorationChance)
                     {
