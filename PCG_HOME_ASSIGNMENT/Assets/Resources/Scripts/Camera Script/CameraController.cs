@@ -57,7 +57,7 @@ public class CameraController : MonoBehaviour
         playerTransform = playerTrans;
     }
 
-    public void UpdateBiomeTint()
+    private void UpdateBiomeTint()
     {
         if (playerTransform != null)
         {

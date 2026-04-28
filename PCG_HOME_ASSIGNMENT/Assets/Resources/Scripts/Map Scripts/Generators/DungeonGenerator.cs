@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using NUnit.Framework;
 using ProceduralDungeon.Settings;
+using ProceduralDungeon.Spawning;
 using Sirenix.OdinInspector;
 using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
@@ -23,6 +24,9 @@ namespace ProceduralDungeon.Generator
         //Biome Generation Call
         private BiomeGenerator biomeGenerator;
         private List<BiomeType> roomBiomesCache = new  List<BiomeType>();
+
+        [Header("Enemy Settings")] [FoldoutGroup("Enemies")] [SerializeField]
+        private EnemyRoomSpawner enemySpawner;
         
         //Tilemaps and Settings
         [Header("Dungeon Generation")]
@@ -45,9 +49,13 @@ namespace ProceduralDungeon.Generator
         [FoldoutGroup("Generation")] 
         [SerializeField] private Tilemap biomeTileMap;
         
+        ///<Summary>
+        /// Dungeon Generation and Painting Below
+        /// <Summary>
+        
         // struct for rooms and all necessary aspects of it
         [System.Serializable]
-        private struct Room
+        public struct Room
         {
             public int x, y;
             public int width, height;
@@ -155,6 +163,8 @@ namespace ProceduralDungeon.Generator
             }
             
             GenerateDecorations(rooms, tileData);
+            
+            SpawnEnemiesInRooms(rooms);
         }
 
         [Button("Reset Dungeon")]
@@ -710,5 +720,26 @@ namespace ProceduralDungeon.Generator
 
             return combined;
         }
+
+        ///<Summary>s
+        /// Enemy Spawning Below
+        /// <Summary>
+
+        //Spawns enemies in random rooms
+        public void SpawnEnemiesInRooms(List<Room> rooms)
+        {
+            if (enemySpawner == null) return;
+
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                Room room = rooms[i];
+
+                if (room.isSpawnRoom || room.isEndRoom) continue;
+                
+                Rect roomBounds = new Rect(room.x, room.y, room.width, room.height);
+                enemySpawner.SpawnEnemiesForRoom(i, roomBounds);
+            }
+    }
+        
     }
 }

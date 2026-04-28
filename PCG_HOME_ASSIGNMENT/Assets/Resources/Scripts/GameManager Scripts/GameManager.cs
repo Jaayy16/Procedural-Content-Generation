@@ -3,6 +3,7 @@ using UnityEngine;
 using ProceduralDungeon.Generator;
 using ProceduralDungeon.Player;
 using ProceduralDungeon.Settings;
+using ProceduralDungeon.Spawning;
 using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
@@ -19,6 +20,8 @@ public class GameManager : MonoBehaviour
     
     [SerializeField] private DungeonGenerator dungeonGenerator;
     [SerializeField] private DungeonSettings dungeonSettings;
+
+    [SerializeField] private EnemySpawnerSettings enemySettings;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

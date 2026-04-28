@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 7683089134279924893}
   - component: {fileID: 5190725221318418021}
   - component: {fileID: 6581305391485816417}
+  - component: {fileID: 3295632740204444203}
+  - component: {fileID: 8440731766782700953}
   m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
@@ -80,7 +82,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -176,7 +178,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeed: 20
-  waterSlowMultiplier: 0.25
+  waterSlowMultiplier: 0.5
   wallTilemap: {fileID: 0}
   floorTilemap: {fileID: 0}
   decorationTilemap: {fileID: 0}
@@ -208,3 +210,35 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fd2ce1c88b0b81a49b1cecbb479c8244, type: 2}
   lavaDmgPerSecond: 5
   gridCellSize: 1
+--- !u!114 &3295632740204444203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4216229327325777129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37ff01bceea545841a27c9886eb6a987, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionScript: {fileID: 8440731766782700953}
+  atkDmg: 10
+  atkCooldown: 0.5
+  atkRotationSpd: 10
+--- !u!114 &8440731766782700953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4216229327325777129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc40e082bc4212c40995ecccccc3c2da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRadius: 2.5
+  detectionMask:
+    serializedVersion: 2
+    m_Bits: 1024

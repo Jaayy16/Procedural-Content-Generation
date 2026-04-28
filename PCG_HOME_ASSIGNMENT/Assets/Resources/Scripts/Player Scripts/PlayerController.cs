@@ -41,7 +41,6 @@ namespace ProceduralDungeon.Player
         private BiomeType currentBiome = BiomeType.Normal;
         
         private float playerHealth = 100f;
-        
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -65,6 +64,11 @@ namespace ProceduralDungeon.Player
             if (decorationTilemap == null)
             {
                 decorationTilemap = GameObject.Find("Decorations").GetComponent<Tilemap>();
+            }
+
+            if (biomeTileMap == null)
+            {
+                biomeTileMap = GameObject.Find("Biomes").GetComponent<Tilemap>();
             }
         }
 
@@ -151,30 +155,21 @@ namespace ProceduralDungeon.Player
         {
             Vector3Int playerCell = floorTilemap.WorldToCell(transform.position);
             isOnWater = false;
-            
-            TileBase tile = biomeTileMap.GetTile(playerCell);
 
-            if (tile != null && isWaterTile(tile))
+            if (biomeTileMap != null)
             {
-                isOnWater = true;
-                return;
+                TileBase tile = biomeTileMap.GetTile(playerCell);
+                
+                if (tile != null && IsWaterTile(tile)) 
+                { 
+                    isOnWater = true;
+                    return;
+                }
             }
             
-            tile = floorTilemap.GetTile(playerCell);
-            if (tile != null && isWaterTile(tile))
-            {
-                isOnWater = true;
-                return;
-            }
-
-            tile = wallTilemap.GetTile(playerCell);
-            if (tile != null && isWaterTile(tile))
-            {
-                isOnWater = true;
-            }
         }
 
-        private bool isWaterTile(TileBase tile)
+        private bool IsWaterTile(TileBase tile)
         {
             if (tile == null || waterTiles == null) return false;
 
@@ -192,23 +187,19 @@ namespace ProceduralDungeon.Player
             Vector3Int playerCell = floorTilemap.WorldToCell(transform.position);
             isOnLava = false;
 
-            TileBase tile = biomeTileMap.GetTile(playerCell);
-            
-            if(tile != null && isLavaTile(tile))
+            if (biomeTileMap != null)
             {
-                isOnLava = true;
-                return;
-            }
+                TileBase tile = biomeTileMap.GetTile(playerCell);
 
-            tile = floorTilemap.GetTile(playerCell);
-            if (tile != null && isLavaTile(tile))
-            {
-                isOnLava = true;
-                return;
+                if (tile != null && IsLavaTile(tile))
+                {
+                    isOnLava = true;
+                    return;
+                }
             }
         }
 
-        private bool isLavaTile(TileBase tile)
+        private bool IsLavaTile(TileBase tile)
         {
             if(tile == null || lavaTiles == null) return false;
 
@@ -261,11 +252,11 @@ namespace ProceduralDungeon.Player
 
             if (tile != null)
             {
-                if (isLavaTile(tile))
+                if (IsLavaTile(tile))
                 {
                     detectedBiome = BiomeType.Molten;
                 }
-                else if (isWaterTile(tile))
+                else if (IsWaterTile(tile))
                 {
                     detectedBiome = BiomeType.Flooded;
                 }
