@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2031226041881614391}
   - component: {fileID: 2608225515111474565}
-  - component: {fileID: -2281710717325295450}
   - component: {fileID: -7961600345306627579}
   - component: {fileID: -3114571728927714959}
+  - component: {fileID: 896362944052102481}
   m_Layer: 10
   m_Name: MeleeEnemy
   m_TagString: Untagged
@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 7088457593664486996}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 156.78783, y: 178.77626, z: -1.6287712}
+  m_LocalPosition: {x: 40, y: 150, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -90,27 +90,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-2281710717325295450
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7088457593664486996}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 922f10aeac07db74db2e0cf720ed3c7c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hp: 30
-  detectionRad: 3.5
-  detectionLayer:
-    serializedVersion: 2
-    m_Bits: 512
-  moveSpd: 3
-  atkDmg: 15
-  atkCooldown: 1
-  atkRange: 0.5
 --- !u!58 &-7961600345306627579
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -173,4 +152,25 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
+--- !u!114 &896362944052102481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7088457593664486996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52fed7b901f873d4bb3b64c3a8b41db7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHP: 30
+  detectionRad: 3.5
+  moveSpd: 3
+  detectionLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  atkDmg: 15
+  atkCooldown: 1
+  atkRange: 0.8

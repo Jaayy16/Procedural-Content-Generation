@@ -1,24 +1,36 @@
-using System;
+using ProceduralDungeon.Combat;
+using ProceduralDungeon.Pooling;
 using UnityEngine;
 
-namespace ProceduralDungeon.Combat
+namespace ProceduralDungeon.Player
 {
-    public class PlayerCombat : MonoBehaviour
+    public class PlayerCombatPooled : MonoBehaviour
     {
         [SerializeField] private DetectionScript detectionScript;
-        [SerializeField] private float atkDmg = 10f;
+        [SerializeField] private Transform shootPoint;
+        
+        [Header("Attack Settings")]
+        [SerializeField] private float projectileDmg = 10f;
+        [SerializeField] private float projectileSpd = 15f;
         [SerializeField] private float atkCooldown = 0.5f;
-        [SerializeField] private float atkRotationSpd = 10f;
-
+        [SerializeField] private float rotationSpd = 10f;
+        
         private float lastAtkTime = 0f;
-        private Rigidbody2D rb;
 
         void Start()
         {
-            rb = GetComponent<Rigidbody2D>();
             if (detectionScript == null)
             {
                 detectionScript = GetComponent<DetectionScript>();
+                if (detectionScript == null)
+                {
+                    detectionScript = gameObject.AddComponent<DetectionScript>();
+                }
+            }
+
+            if (shootPoint == null)
+            {
+                shootPoint = transform;
             }
         }
 
@@ -40,14 +52,25 @@ namespace ProceduralDungeon.Combat
 
             if (enemy != null)
             {
-                PerformAtk(enemy);
+                FireProjectile(enemy.GetTransform().position);
                 lastAtkTime = Time.time;
             }
         }
 
-        private void PerformAtk(IAttackable target)
+        private void FireProjectile(Vector3 enemyPos)
         {
-            target.TakeDamage(atkDmg);
+            Vector2 shootDir = (enemyPos - shootPoint.position).normalized;
+
+            PooledProjectile projectile = PoolManager.GetProjectile(shootPoint.position); 
+            
+            if (projectile != null)
+            {
+                projectile.Initialize(shootDir, projectileSpd, projectileDmg, "Enemy");
+            }
+            else
+            {
+                Debug.LogError("Projectile Inst missing Projectile Component!");
+            }
         }
 
         private void RotateToClosestEnemy()
@@ -60,7 +83,7 @@ namespace ProceduralDungeon.Combat
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
             transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.AngleAxis(angle, Vector3.forward),
-                Time.deltaTime * atkRotationSpd);
+                Time.deltaTime * rotationSpd);
         }
     }
 }

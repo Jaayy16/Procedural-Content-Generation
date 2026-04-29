@@ -1,4 +1,5 @@
 using System.Collections;
+using ProceduralDungeon.Combat;
 using UnityEngine;
 using ProceduralDungeon.Generator;
 using ProceduralDungeon.Player;

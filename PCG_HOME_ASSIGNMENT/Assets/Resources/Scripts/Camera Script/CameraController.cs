@@ -1,3 +1,4 @@
+using ProceduralDungeon.Combat;
 using ProceduralDungeon.Generator;
 using ProceduralDungeon.Player;
 using ProceduralDungeon.Settings;
@@ -59,7 +60,7 @@ public class CameraController : MonoBehaviour
 
     private void UpdateBiomeTint()
     {
-        if (playerTransform != null)
+        if (playerTransform == null)
         {
             return;
         }

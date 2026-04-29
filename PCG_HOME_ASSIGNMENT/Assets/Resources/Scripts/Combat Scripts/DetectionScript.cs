@@ -8,11 +8,27 @@ namespace ProceduralDungeon.Combat
     {
         [SerializeField] private float detectionRadius = 2.5f;
         [SerializeField] private LayerMask detectionMask;
+        [SerializeField] private string targetTag = "Enemy";
         
         private List<IAttackable> detectedEnemies = new List<IAttackable>();
+        private CircleCollider2D detectionCollider;
 
+        void Start()
+        {
+            SetDetectCollider();
+        }
+
+        private void SetDetectCollider()
+        {
+            detectionCollider = gameObject.AddComponent<CircleCollider2D>();
+            detectionCollider.radius = detectionRadius;
+            detectionCollider.isTrigger = true;
+        }
+        
         public IAttackable GetClosestTarget()
         {
+            detectedEnemies.RemoveAll(x => x == null || !x.IsAlive());
+            
             if(detectedEnemies.Count == 0) return null;
             
             IAttackable closest = null;

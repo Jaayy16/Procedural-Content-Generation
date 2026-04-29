@@ -26,7 +26,7 @@ namespace ProceduralDungeon.Generator
         private List<BiomeType> roomBiomesCache = new  List<BiomeType>();
 
         [Header("Enemy Settings")] [FoldoutGroup("Enemies")] [SerializeField]
-        private EnemyRoomSpawner enemySpawner;
+        private PooledEnemyRoomSpawner enemySpawner;
         
         //Tilemaps and Settings
         [Header("Dungeon Generation")]

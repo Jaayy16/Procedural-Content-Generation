@@ -7,5 +7,6 @@ namespace ProceduralDungeon.Combat
         void TakeDamage(float damage);
         float GetHealth();
         Transform GetTransform();
+        bool IsAlive();
     }
 }

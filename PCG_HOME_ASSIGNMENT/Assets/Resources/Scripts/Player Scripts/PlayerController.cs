@@ -1,14 +1,15 @@
 using System;
+using ProceduralDungeon.Combat;
 using ProceduralDungeon.Generator;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
-namespace ProceduralDungeon.Player
+namespace ProceduralDungeon.Combat
 {
 
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : MonoBehaviour, IAttackable
     {
         [Header("Movement Settings")] [SerializeField, Range(0, 20)]
         private float movementSpeed = 5f;
@@ -235,6 +236,17 @@ namespace ProceduralDungeon.Player
             
         }
 
+        public void TakeDamage(float damage)
+        {
+            playerHealth -= damage;
+            Debug.Log($"Player too {damage} DMG! Health: {playerHealth}");
+
+            if (playerHealth <= 0)
+            {
+                Die();
+            }
+        }
+        
         private void Die()
         {
             Debug.Log("Player Died");
@@ -287,5 +299,8 @@ namespace ProceduralDungeon.Player
     
         public bool GetIsOnWater() => isOnWater;
         public bool GetIsOnLava() => isOnLava;
+        public float GetHealth() => playerHealth;
+        public Transform GetTransform() => transform;
+        public bool IsAlive() => playerHealth > 0;
     }
 }
