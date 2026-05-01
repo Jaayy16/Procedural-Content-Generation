@@ -160,17 +160,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 184745495}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 096f2075e3f98b1488a1daf1091c9dd3, type: 3}
+  m_Script: {fileID: 11500000, guid: d8d3b9da9afeaae43913d74c509ea7a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   spawnerSettings:
     rangedEnemyPrefab: {fileID: 3772428331586068195, guid: 47cfc6ab84976c3468fe64226eb37f86, type: 3}
     meleeEnemyPrefab: {fileID: 7088457593664486996, guid: b351315ea632814459c0a77db53e0d53, type: 3}
     spawnEverywhere: 0
-    minPerRoom: 1
+    minPerRoom: 5
     maxPerRoom: 10
-    spawnChancePerRoom: 50
+    spawnChancePerRoom: 100
     rangedEnemyRatio: 40
+  floorTilemap: {fileID: 466769964}
 --- !u!1 &270806720
 GameObject:
   m_ObjectHideFlags: 0

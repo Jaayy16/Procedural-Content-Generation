@@ -26,7 +26,7 @@ namespace ProceduralDungeon.Generator
         private List<BiomeType> roomBiomesCache = new  List<BiomeType>();
 
         [Header("Enemy Settings")] [FoldoutGroup("Enemies")] [SerializeField]
-        private PooledEnemyRoomSpawner enemySpawner;
+        private GridBasedSpawner enemySpawner;
         
         //Tilemaps and Settings
         [Header("Dungeon Generation")]
@@ -164,7 +164,7 @@ namespace ProceduralDungeon.Generator
             
             GenerateDecorations(rooms, tileData);
             
-            SpawnEnemiesInRooms(rooms);
+            SpawnEnemiesInRooms(rooms, tileData);
         }
 
         [Button("Reset Dungeon")]
@@ -726,9 +726,13 @@ namespace ProceduralDungeon.Generator
         /// <Summary>
 
         //Spawns enemies in random rooms
-        public void SpawnEnemiesInRooms(List<Room> rooms)
+        public void SpawnEnemiesInRooms(List<Room> rooms, bool[,] floorTileData)
         {
-            if (enemySpawner == null) return;
+            if (enemySpawner == null)
+            {
+                Debug.LogError("[SPAWNER] GridBasedSpawner not assigned!s");
+                return;
+            }
 
             for (int i = 0; i < rooms.Count; i++)
             {
@@ -737,7 +741,7 @@ namespace ProceduralDungeon.Generator
                 if (room.isSpawnRoom || room.isEndRoom) continue;
                 
                 Rect roomBounds = new Rect(room.x, room.y, room.width, room.height);
-                enemySpawner.SpawnEnemiesForRoom(i, roomBounds);
+                enemySpawner.SpawnEnemiesGridBased(i, roomBounds, floorTileData);
             }
     }
         

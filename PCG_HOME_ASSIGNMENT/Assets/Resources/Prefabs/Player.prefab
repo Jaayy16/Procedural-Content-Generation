@@ -240,7 +240,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   detectionScript: {fileID: 0}
-  shootPoint: {fileID: 0}
+  shootPoint: {fileID: 3624014346949055935}
+  projectilePrefab: {fileID: 7832230423321154636, guid: 3b504d97bc4e6bc4c93be225376f57a7, type: 3}
   projectileDmg: 10
   projectileSpd: 15
   atkCooldown: 0.5

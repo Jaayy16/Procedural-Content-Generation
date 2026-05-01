@@ -8,7 +8,8 @@ namespace ProceduralDungeon.Player
     {
         [SerializeField] private DetectionScript detectionScript;
         [SerializeField] private Transform shootPoint;
-        
+        [SerializeField] private GameObject projectilePrefab;
+
         [Header("Attack Settings")]
         [SerializeField] private float projectileDmg = 10f;
         [SerializeField] private float projectileSpd = 15f;
@@ -61,11 +62,12 @@ namespace ProceduralDungeon.Player
         {
             Vector2 shootDir = (enemyPos - shootPoint.position).normalized;
 
-            PooledProjectile projectile = PoolManager.GetProjectile(shootPoint.position); 
+            GameObject projectile = Instantiate(projectilePrefab, shootPoint.position, Quaternion.identity);
+            PooledProjectile projectileScript = projectile.GetComponent<PooledProjectile>();
             
             if (projectile != null)
             {
-                projectile.Initialize(shootDir, projectileSpd, projectileDmg, "Enemy");
+                projectileScript.Initialize(shootDir, projectileSpd, projectileDmg, "Enemy");
             }
             else
             {

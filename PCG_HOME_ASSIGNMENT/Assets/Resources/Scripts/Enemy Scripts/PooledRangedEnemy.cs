@@ -45,7 +45,7 @@ namespace ProceduralDungeon.Combat
             Vector2 shootDir = (playerTransform.position - shootPoint.position).normalized;
             
             GameObject projectile = Instantiate(projectilePrefab, shootPoint.position, Quaternion.identity);
-            PooledProjectile projectileScript = projectilePrefab.GetComponent<PooledProjectile>();
+            PooledProjectile projectileScript = projectile.GetComponent<PooledProjectile>();
             
             if (projectileScript != null)
             {

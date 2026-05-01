@@ -30,7 +30,7 @@ namespace ProceduralDungeon.Pooling
         {
             if (_instance == null)
             {
-                Debug.LogError("[POOL] Pool Manager instance not found! Add it to the scene.");
+               _instance = FindObjectOfType<PoolManager>();
             }
             
             return _instance;

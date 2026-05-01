@@ -42,11 +42,8 @@ namespace ProceduralDungeon.Combat
             dmg = projectileDmg;
             targetTag = targetTagName;
             timeAlive = 0f;
-
-            if (rb != null)
-            {
-                rb.linearVelocity = dir * spd;
-            }
+            
+            rb.linearVelocity = dir * spd;
             
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
@@ -69,6 +66,7 @@ namespace ProceduralDungeon.Combat
             {
                 Debug.Log("[POOL] Projectile hit a Wall!");
                 ReturnToPool();
+                return;
             }
         }
 
@@ -89,6 +87,7 @@ namespace ProceduralDungeon.Combat
             if (rb != null)
             {
                 rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0;
             }
         }
 
@@ -97,6 +96,7 @@ namespace ProceduralDungeon.Combat
             if (rb != null)
             {
                 rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0;
             }
         }
     }
