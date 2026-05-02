@@ -2,7 +2,7 @@ namespace ProceduralDungeon.Pooling
 {
     public interface IPoolable
     {
-        void OnPoolCreated();
+        void OnPoolCreate();
         void OnPoolGet();
         void OnPoolReturn();
     }

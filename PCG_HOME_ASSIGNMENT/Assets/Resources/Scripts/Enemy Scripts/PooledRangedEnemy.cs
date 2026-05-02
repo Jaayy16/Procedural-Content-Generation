@@ -1,4 +1,5 @@
 using ProceduralDungeon.Enemy;
+using ProceduralDungeon.Pooling;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -43,13 +44,16 @@ namespace ProceduralDungeon.Combat
             if (projectilePrefab == null || playerTransform == null) return;
             
             Vector2 shootDir = (playerTransform.position - shootPoint.position).normalized;
-            
-            GameObject projectile = Instantiate(projectilePrefab, shootPoint.position, Quaternion.identity);
-            PooledProjectile projectileScript = projectile.GetComponent<PooledProjectile>();
+
+            PooledProjectile projectileScript = PoolManager.GetProjectile(shootPoint.position);
             
             if (projectileScript != null)
             {
                 projectileScript.Initialize(shootDir, projectileSpd, projectileDmg, "Player");
+            }
+            else
+            {
+                Debug.LogError("Projectile Inst. missing Projectile Component!");
             }
         }
 

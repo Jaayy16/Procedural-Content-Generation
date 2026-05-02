@@ -62,16 +62,15 @@ namespace ProceduralDungeon.Player
         {
             Vector2 shootDir = (enemyPos - shootPoint.position).normalized;
 
-            GameObject projectile = Instantiate(projectilePrefab, shootPoint.position, Quaternion.identity);
-            PooledProjectile projectileScript = projectile.GetComponent<PooledProjectile>();
+            PooledProjectile projectile = PoolManager.GetProjectile(shootPoint.position);
             
             if (projectile != null)
             {
-                projectileScript.Initialize(shootDir, projectileSpd, projectileDmg, "Enemy");
+                projectile.Initialize(shootDir, projectileSpd, projectileDmg, "Enemy");
             }
             else
             {
-                Debug.LogError("Projectile Inst missing Projectile Component!");
+                Debug.LogError("Projectile Inst. missing Projectile Component!");
             }
         }
 

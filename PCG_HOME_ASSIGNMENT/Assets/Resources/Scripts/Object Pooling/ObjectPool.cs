@@ -44,7 +44,7 @@ namespace ProceduralDungeon.Pooling
             obj.gameObject.name = $"{poolName}_{allObjects.Count}";
             obj.gameObject.SetActive(false);
             
-            obj.OnPoolCreated();
+            obj.OnPoolCreate();
             
             allObjects.Add(obj);
             availableObjects.Enqueue(obj);

@@ -183,7 +183,6 @@ GameObject:
   - component: {fileID: 270806721}
   - component: {fileID: 270806724}
   - component: {fileID: 270806723}
-  - component: {fileID: 270806722}
   m_Layer: 7
   m_Name: Biomes
   m_TagString: Untagged
@@ -206,44 +205,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1545065530}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!19719996 &270806722
-TilemapCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 270806720}
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_MaximumTileChangeCount: 1000
-  m_ExtrusionFactor: 0
-  m_UseDelaunayMesh: 0
 --- !u!483693784 &270806723
 TilemapRenderer:
   m_ObjectHideFlags: 0
@@ -10166,7 +10127,7 @@ MonoBehaviour:
     rangedEnemyPrefab: {fileID: 3772428331586068195, guid: 47cfc6ab84976c3468fe64226eb37f86, type: 3}
     meleeEnemyPrefab: {fileID: 7088457593664486996, guid: b351315ea632814459c0a77db53e0d53, type: 3}
     spawnEverywhere: 0
-    minPerRoom: 1
+    minPerRoom: 5
     maxPerRoom: 10
     spawnChancePerRoom: 50
     rangedEnemyRatio: 40
@@ -13942,7 +13903,7 @@ Transform:
   m_GameObject: {fileID: 1479278625}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 102.45434, y: 94.27417, z: -3.0543752}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

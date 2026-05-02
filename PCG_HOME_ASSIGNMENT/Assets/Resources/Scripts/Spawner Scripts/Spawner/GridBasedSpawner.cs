@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ProceduralDungeon.Combat;
 using ProceduralDungeon.Enemy;
 using ProceduralDungeon.Pooling;
@@ -14,10 +15,9 @@ namespace ProceduralDungeon.Spawning
         [SerializeField] private Tilemap floorTilemap;
 
         private System.Random spawnRng;
-        private bool hasSpawnedEnemies = false;
-        private int roomIndexToSpawn = -1;
-        private Rect currentRoomBounds;
-        private bool[,] currentFloorTileData;
+        private bool playerFound = false;
+        
+        private Queue<(Rect bounds, bool[,] tileData)> spawnQueue = new Queue<(Rect, bool[,])>();
         
         void Start()
         {
@@ -26,11 +26,27 @@ namespace ProceduralDungeon.Spawning
 
         void Update()
         {
-            if (!hasSpawnedEnemies && roomIndexToSpawn >= 0 && GameObject.FindGameObjectWithTag("Player") != null)
+
+            if (!Application.isPlaying) return;
+            
+
+            if (!playerFound)
             {
-                Debug.Log("[SPAWNER] Player Found");
-                SpawnEnemyOnGrid(currentRoomBounds, currentFloorTileData);
-                roomIndexToSpawn = -1;
+                GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+                if (player != null)
+                {
+                    playerFound = true;
+                    Debug.Log($"[SPAWNER] Player found! Starting enemy spawn queue...s");
+                }
+            }
+            
+            if (playerFound && spawnQueue.Count > 0)
+            {
+                var (bounds, tileData) = spawnQueue.Dequeue();
+                SpawnEnemyOnGrid(bounds, tileData);
+                Debug.Log($"[SPAWNER] Spawned enemy from queue. Remaining: {spawnQueue.Count}");
+
             }
         }
         
@@ -50,21 +66,44 @@ namespace ProceduralDungeon.Spawning
 
             for (int i = 0; i < enemyCount; i++)
             {
-                SpawnEnemyOnGrid(roomBounds, floorTileData);
+                spawnQueue.Enqueue((roomBounds, floorTileData));
             }
         }
 
+        public void spawnAllQueued()
+        {
+            Debug.Log($"[SPAWNER] SpawnAllQueued called - spawning {spawnQueue.Count} enemies");
+
+            int spawnedCount = 0;
+            while (spawnQueue.Count > 0)
+            {
+                var (bounds, tileData) = spawnQueue.Dequeue();
+                SpawnEnemyOnGrid(bounds, tileData);
+                spawnedCount++;
+            }
+            
+            Debug.Log($"[SPAWNER] Spawned All Queued Enemies");
+        }
+        
         private bool ShouldSpawnInRoom(int roomIndex)
         {
 
             float spawnChance = spawnerSettings.spawnChancePerRoom;
 
+            if (roomIndex == 0)
+            {
+                return false;
+            }
+            
             if (!spawnerSettings.spawnEverywhere && roomIndex % 2 == 0)
             {
                 return false;
             }
             
-            return Random.Range(0, 100) < spawnChance;
+            int roll = Random.Range(0, 100);
+            bool shouldSpawn = roll <= spawnChance;
+            
+            return shouldSpawn;
 
         }
 

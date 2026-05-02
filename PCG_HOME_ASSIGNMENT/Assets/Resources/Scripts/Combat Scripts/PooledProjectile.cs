@@ -75,7 +75,7 @@ namespace ProceduralDungeon.Combat
             PoolManager.ReturnProjectile(this);
         }
 
-        public void OnPoolCreated()
+        public void OnPoolCreate()
         {
             //Is called once when the pool is created
         }

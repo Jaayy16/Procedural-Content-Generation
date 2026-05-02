@@ -19,6 +19,10 @@ namespace ProceduralDungeon.Enemy
         protected bool isAlive = true;
         protected float currentHP;
 
+        private float lastPlayerSearchTime = 0f;
+        private float playerSearchInterval = 1f;
+        private bool isPooled = false;
+        
         protected virtual void OnEnable()
         {
             rb = GetComponent<Rigidbody2D>();
@@ -31,7 +35,11 @@ namespace ProceduralDungeon.Enemy
             }
             
             currentHP = maxHP;
-            FindPlayer();
+
+            if (!isPooled)
+            {
+                FindPlayer();
+            }
         }
 
         protected virtual void Start()
@@ -41,6 +49,13 @@ namespace ProceduralDungeon.Enemy
         protected virtual void Update()
         {
             if(!isAlive) return;
+
+            if (playerTransform == null && Time.time - lastPlayerSearchTime > playerSearchInterval)
+            {
+                FindPlayer();
+                lastPlayerSearchTime = Time.time;
+            }
+            
             DetectPlayer();
         }
 
@@ -131,7 +146,7 @@ namespace ProceduralDungeon.Enemy
             }
             else
             {
-                Debug.LogError("No player found");
+                Debug.LogWarning($"[ENEMY] {gameObject.name} - Hasn't found player yet (Retrying...)");
             }
         }
 
@@ -145,24 +160,35 @@ namespace ProceduralDungeon.Enemy
 
         #region IPoolable Implemented
 
-        public virtual void OnPoolCreated()
+        public virtual void OnPoolCreate()
         {
+            isPooled = true;
             Debug.Log($"[POOL] {gameObject.name} created for pooling");
         }
 
         public virtual void OnPoolGet()
         {
+            isPooled = false;
             isAlive = true;
             currentHP = maxHP;
             rb.linearVelocity = Vector2.zero;
             isPlayerDetected = false;
+            lastPlayerSearchTime = 0f;
+
+            if (playerTransform == null)
+            {
+                FindPlayer();
+            }
+            
             Debug.Log($"[POOL] {gameObject.name} has been retrieved from pool");
         }
 
         public virtual void OnPoolReturn()
         {
+            isPooled = true;
             rb.linearVelocity = Vector2.zero;
-            isPlayerDetected = true;
+            isPlayerDetected = false;
+            playerTransform = null;
             Debug.Log($"[POOL] {gameObject.name} has been returned to pool");
         }
 
