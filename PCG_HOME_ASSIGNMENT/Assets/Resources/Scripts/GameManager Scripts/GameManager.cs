@@ -24,54 +24,33 @@ public class GameManager : MonoBehaviour
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private DungeonSettings dungeonSettings;
     
-    // delete this
+    // delete this later
 
     void Start()
     {
-        Debug.Log("[GM] ===== START METHOD CALLED =====");
-    
         if (dungeonGenerator != null)
         {
-            Debug.Log($"[GM] Generating Dungeon");
             dungeonGenerator.GenerateDungeon();
-            Debug.Log($"[GM] Dungeon generation complete");
         
-            Debug.Log($"[GM] About to spawn enemies");
             SpawnEnemiesInRooms();
-            Debug.Log($"[GM] Enemy spawning complete");
         }
         else
         {
-            Debug.LogError("[GM] DungeonGenerator is NULL!");
+            Debug.LogError("[GM] Generator is not refrenced");
         }
 
-        Debug.Log("[GM] About to start coroutine");
         StartCoroutine(SpawnWhenWorldReady());
-        Debug.Log("[GM] Coroutine started");
     }
     
     private void SpawnEnemiesInRooms()
     {
-        Debug.Log("[GM] ===== SPAWN ENEMIES IN ROOMS START =====");
-    
         if (enemySpawner == null)
         {
-            Debug.LogError("[GM] Enemy spawner is NULL!");
-            return;
-        }
-        Debug.Log("[GM] Enemy spawner assigned");
-
-        // delete above
-        
-        if (enemySpawner == null)
-        {
-            Debug.LogError("[GM] enemy spawner not assigned!");
             return;
         }
 
         if (dungeonGenerator == null)
         {
-            Debug.LogError("[GM] dungeonGenerator not assigned!");
             return;
         }
 
@@ -79,26 +58,21 @@ public class GameManager : MonoBehaviour
 
         if (rooms == null || rooms.Count == 0)
         {
-            Debug.LogError("[GM] no rooms generated!");
             return;
         }
         
-        for (int i = 0; i < rooms.Count; i++)
+        for (int i = 1; i < rooms.Count - 1; i++)
         {
             DungeonGenerator.Room currentRoom = rooms[i];
-
+            Rect roomBounds = new Rect(currentRoom.x, currentRoom.y, currentRoom.width, currentRoom.height);
+            
             if (currentRoom.isSpawnRoom || currentRoom.isEndRoom)
             {
                 continue;
             }
             
-            Rect roomBounds = new Rect(currentRoom.x, currentRoom.y, currentRoom.width, currentRoom.height);
-            
-            enemySpawner.SpawnEnemiesInRoom(roomBounds);
+            enemySpawner.SpawnEnemiesInRoom(roomBounds, i);
         }
-        
-        Debug.Log($"[GM] Spawning Enemies in {rooms.Count} rooms");
-        
     }
     
     private IEnumerator SpawnWhenWorldReady()
@@ -112,7 +86,7 @@ public class GameManager : MonoBehaviour
             SetupCamera(playerInstance.transform);
         }
     }
-
+    
     private GameObject SpawnPlayer()
     {
         if (playerPrefab == null || portalTileMap == null)

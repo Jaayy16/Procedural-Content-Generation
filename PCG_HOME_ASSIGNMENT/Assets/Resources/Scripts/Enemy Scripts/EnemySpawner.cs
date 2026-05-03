@@ -18,7 +18,7 @@ namespace ProceduralDungeon.Enemy
 
         private int totalEnemiesSpawned;
         
-        public void SpawnEnemiesInRoom(Rect roomBounds)
+        public void SpawnEnemiesInRoom(Rect roomBounds, int roomIndex)
         {
             if (!ValidAssignment()) return;
             
@@ -53,28 +53,39 @@ namespace ProceduralDungeon.Enemy
 
         private Vector3 GetRandomFloorTileInRoom(Rect roomBounds)
         {
-            Debug.Log($"[SPAWNER] GET RANDOM SPAWN POS CALLED with bounds: {roomBounds}");
 
-            //delete the above
+            int attemptCount = 0;
             
-            for (int attempts = 0; attempts < 10; attempts++)
+            for (int attempts = 0; attempts < 50; attempts++)
             {
-                float xRand = Random.Range(roomBounds.xMin + 1f, roomBounds.xMax - 1f);
-                float yRand = Random.Range(roomBounds.yMin + 1f, roomBounds.yMax - 1f);
-                Vector3 randomPos = new Vector3(xRand, yRand, 0f);
+                int xMin = (int)roomBounds.xMin;
+                int xMax = (int)roomBounds.xMax;
+                int yMin = (int)roomBounds.yMin;
+                int yMax = (int)roomBounds.yMax;
                 
-                Vector3Int cellPos = floorTilemap.WorldToCell(randomPos);
+                int xRand = Random.Range(xMin + 1, xMax - 1);
+                int yRand = Random.Range(yMin + 1, yMax - 1);
                 
-                cellPos = new Vector3Int(cellPos.x, cellPos.y, 0);
-                
+                Vector3Int cellPos = new Vector3Int(xRand, yRand, 0);
                 TileBase tile = floorTilemap.GetTile(cellPos);
 
+                attemptCount++;
+                
                 if (tile != null) 
                 {
                     Vector3 worldPos = floorTilemap.CellToWorld(cellPos) + new Vector3(0.5f, 0.5f, 0f);
                     return worldPos;
                 }
             }
+
+            BoundsInt cellBounds = floorTilemap.cellBounds;
+            int floorTileCount = 0;
+
+            foreach (Vector3Int pos in cellBounds.allPositionsWithin)
+            {
+                if (floorTilemap.GetTile(pos) != null) floorTileCount++;
+            }
+            
             return Vector3Int.zero;
         }
 
