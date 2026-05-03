@@ -126,7 +126,9 @@ namespace ProceduralDungeon.Generator
                 return norm <= 1f;
             }
         }
-
+        
+        private List<Room> generatedRooms = new List<Room>();
+        
         [Button("Generate Dungeon")]
         public void GenerateDungeon()
         {
@@ -141,26 +143,26 @@ namespace ProceduralDungeon.Generator
             varianceGenerator = new TileVarianceGenerator(dungeonSettings, dungeonSettings.Seed);
             biomeGenerator = new BiomeGenerator(dungeonSettings, dungeonSettings.Seed);
             
-            List<Room> rooms = GenerateRooms();
-            Debug.Log($"Generated {rooms.Count} rooms");
+            generatedRooms = GenerateRooms();
+            Debug.Log($"Generated {generatedRooms.Count} rooms");
 
             if (dungeonSettings.EnableBiomes)
             {
-                biomeGenerator.AssignBiome(rooms.Count);
-                CacheRoomBiomes(rooms);
+                biomeGenerator.AssignBiome(generatedRooms.Count);
+                CacheRoomBiomes(generatedRooms);
             }
             
-            GenerateCorridors(rooms);
+            GenerateCorridors(generatedRooms);
 
-            bool[,] tileData = PaintDungeonTiles(rooms);
+            bool[,] tileData = PaintDungeonTiles(generatedRooms);
 
             if (dungeonSettings.EnableBiomes)
             {
-                ApplyRoomBiomes(rooms);
-                ApplyCorridorBiomes(rooms);
+                ApplyRoomBiomes(generatedRooms);
+                ApplyCorridorBiomes(generatedRooms);
             }
             
-            GenerateDecorations(rooms, tileData);
+            GenerateDecorations(generatedRooms, tileData);
             
         }
 
@@ -718,11 +720,10 @@ namespace ProceduralDungeon.Generator
             return combined;
         }
 
-        ///<Summary>
-        /// Enemy Spawning Below
-        /// <Summary>
-
+        public List<Room> GetGeneratedRooms()
+        {
+            return generatedRooms;
+        }
         
-
     }
 }

@@ -12,10 +12,11 @@ GameObject:
   - component: {fileID: 2608225515111474565}
   - component: {fileID: -7961600345306627579}
   - component: {fileID: -3114571728927714959}
-  - component: {fileID: 896362944052102481}
+  - component: {fileID: -5201516728625463810}
+  - component: {fileID: -6189199478175865842}
   m_Layer: 10
   m_Name: MeleeEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -153,7 +154,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &896362944052102481
+--- !u!114 &-5201516728625463810
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -162,15 +163,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 7088457593664486996}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52fed7b901f873d4bb3b64c3a8b41db7, type: 3}
+  m_Script: {fileID: 11500000, guid: 1c8571554fe472a4092aa4caab26049c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 30
-  detectionRad: 3.5
-  moveSpd: 3
-  detectionLayer:
+  maxHealth: 40
+  moveSpeed: 3
+  atkDamage: 15
+  atkRange: 0.8
+  atkCooldown: 1
+--- !u!114 &-6189199478175865842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7088457593664486996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c14ee4c9a0278a247b11e764d4dff4b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRadius: 5
+  playerLayer:
     serializedVersion: 2
     m_Bits: 512
-  atkDmg: 15
-  atkCooldown: 1
-  atkRange: 0.8

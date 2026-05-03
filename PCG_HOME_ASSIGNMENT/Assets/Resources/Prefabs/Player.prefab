@@ -13,11 +13,11 @@ GameObject:
   - component: {fileID: 7683089134279924893}
   - component: {fileID: 5190725221318418021}
   - component: {fileID: 6581305391485816417}
-  - component: {fileID: 8440731766782700953}
-  - component: {fileID: -1175466319235048131}
+  - component: {fileID: -5827481219439471076}
+  - component: {fileID: -6487564223554652242}
   m_Layer: 9
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -210,7 +210,29 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fd2ce1c88b0b81a49b1cecbb479c8244, type: 2}
   lavaDmgPerSecond: 5
   gridCellSize: 1
---- !u!114 &8440731766782700953
+--- !u!114 &-5827481219439471076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4216229327325777129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bb776e55f0e2f74cb413803df590c4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRadius: 6
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  projectilePrefab: {fileID: 7832230423321154636, guid: fed6a5522b8dd1046b20b6c0f0add101, type: 3}
+  shootPoint: {fileID: 0}
+  projectileSpeed: 15
+  projectileDamage: 10
+  atkCooldown: 0.5
+  rotationSpeed: 10
+--- !u!114 &-6487564223554652242
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -227,22 +249,3 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1024
   targetTag: Enemy
---- !u!114 &-1175466319235048131
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4216229327325777129}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cf7b833042cbd541a8bfe711c90def1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  detectionScript: {fileID: 0}
-  shootPoint: {fileID: 3624014346949055935}
-  projectilePrefab: {fileID: 7832230423321154636, guid: 3b504d97bc4e6bc4c93be225376f57a7, type: 3}
-  projectileDmg: 10
-  projectileSpd: 15
-  atkCooldown: 0.5
-  rotationSpd: 10

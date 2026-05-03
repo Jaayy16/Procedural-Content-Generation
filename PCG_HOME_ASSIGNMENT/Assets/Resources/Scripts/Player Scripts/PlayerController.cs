@@ -6,7 +6,7 @@ using Sirenix.OdinInspector;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
-namespace ProceduralDungeon.Combat
+namespace ProceduralDungeon.Player
 {
 
     public class PlayerController : MonoBehaviour, IAttackable

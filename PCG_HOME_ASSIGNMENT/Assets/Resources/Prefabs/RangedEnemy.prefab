@@ -12,10 +12,11 @@ GameObject:
   - component: {fileID: 5008041709403739315}
   - component: {fileID: -5592260677136465660}
   - component: {fileID: 3041492960701410718}
-  - component: {fileID: 6909136222882696512}
+  - component: {fileID: 2339200875491339850}
+  - component: {fileID: -7742584078429810824}
   m_Layer: 10
   m_Name: RangedEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -167,7 +168,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &6909136222882696512
+--- !u!114 &2339200875491339850
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -176,17 +177,30 @@ MonoBehaviour:
   m_GameObject: {fileID: 3772428331586068195}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4aad095779b1e247adad6ebbe691746, type: 3}
+  m_Script: {fileID: 11500000, guid: 6ab76a8a4d67bef46a055631a72459c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 30
-  detectionRad: 3.5
-  moveSpd: 3
-  detectionLayer:
+  maxHealth: 40
+  moveSpeed: 3
+  projectilePrefab: {fileID: 7832230423321154636, guid: fed6a5522b8dd1046b20b6c0f0add101, type: 3}
+  shootPoint: {fileID: 0}
+  shotCooldown: 1.5
+  projectileSpeed: 10
+  projectileDamage: 8
+  preferredDistance: 5
+--- !u!114 &-7742584078429810824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3772428331586068195}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c14ee4c9a0278a247b11e764d4dff4b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRadius: 5
+  playerLayer:
     serializedVersion: 2
     m_Bits: 512
-  projectilePrefab: {fileID: 7832230423321154636, guid: 3b504d97bc4e6bc4c93be225376f57a7, type: 3}
-  shootPoint: {fileID: 5358463931375442533}
-  shootCooldown: 1
-  projectileSpd: 8
-  projectileDmg: 8

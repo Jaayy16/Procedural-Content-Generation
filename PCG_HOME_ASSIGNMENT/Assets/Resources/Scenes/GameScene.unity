@@ -10030,6 +10030,7 @@ MonoBehaviour:
   trapTilemap: {fileID: 308154340}
   biomeTileMap: {fileID: 270806724}
   dungeonGenerator: {fileID: 1508963823}
+  enemySpawner: {fileID: 1493929523}
   dungeonSettings:
     dungeonWidth: 80
     dungeonHeight: 60
@@ -10044,7 +10045,7 @@ MonoBehaviour:
     spawnChance: 0.15
     minDistFromCentre: 2
     decorationChance: 0.15
-    seed: 12345
+    seed: 54321
     enableFloorVariance: 1
     enableWallVariance: 1
     noiseScale: 1
@@ -13816,6 +13817,56 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
+--- !u!1 &1493929522
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1493929524}
+  - component: {fileID: 1493929523}
+  m_Layer: 10
+  m_Name: EnemySpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1493929523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1493929522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ddf78b3d2555da478bc0e869b26d2e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meleeEnemyPrefab: {fileID: 7088457593664486996, guid: b351315ea632814459c0a77db53e0d53, type: 3}
+  rangedEnemyPrefab: {fileID: 3772428331586068195, guid: 47cfc6ab84976c3468fe64226eb37f86, type: 3}
+  minEnemiesPerRoom: 5
+  maxEnemiesPerRoom: 5
+  rangedEnemyRatio: 0.4
+  floorTilemap: {fileID: 466769964}
+--- !u!4 &1493929524
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1493929522}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1508963820
 GameObject:
   m_ObjectHideFlags: 0
@@ -14024,3 +14075,4 @@ SceneRoots:
   - {fileID: 1545065530}
   - {fileID: 1508963821}
   - {fileID: 565522088}
+  - {fileID: 1493929524}

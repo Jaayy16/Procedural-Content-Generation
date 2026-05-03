@@ -2,6 +2,7 @@ using ProceduralDungeon.Combat;
 using ProceduralDungeon.Generator;
 using ProceduralDungeon.Settings;
 using UnityEngine;
+using ProceduralDungeon.Player;
 
 public class CameraController : MonoBehaviour
 {
