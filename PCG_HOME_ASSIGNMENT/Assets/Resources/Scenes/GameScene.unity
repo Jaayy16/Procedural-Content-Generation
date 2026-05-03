@@ -119,59 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &184745495
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 184745497}
-  - component: {fileID: 184745498}
-  m_Layer: 0
-  m_Name: EnemyRoomSpawner
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &184745497
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 184745495}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &184745498
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 184745495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8d3b9da9afeaae43913d74c509ea7a8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spawnerSettings:
-    rangedEnemyPrefab: {fileID: 3772428331586068195, guid: 47cfc6ab84976c3468fe64226eb37f86, type: 3}
-    meleeEnemyPrefab: {fileID: 7088457593664486996, guid: b351315ea632814459c0a77db53e0d53, type: 3}
-    spawnEverywhere: 0
-    minPerRoom: 5
-    maxPerRoom: 10
-    spawnChancePerRoom: 100
-    rangedEnemyRatio: 40
-  floorTilemap: {fileID: 466769964}
 --- !u!1 &270806720
 GameObject:
   m_ObjectHideFlags: 0
@@ -10123,14 +10070,6 @@ MonoBehaviour:
     - {fileID: 11400000, guid: cf56e399ab19f47469092dcf6746d062, type: 2}
     spawnTile: {fileID: 11400000, guid: 4820b1131e605564f9486a5de89a04c2, type: 2}
     levelExitTile: {fileID: 11400000, guid: 53653df792910ff42ac256a2b381fe59, type: 2}
-  enemySettings:
-    rangedEnemyPrefab: {fileID: 3772428331586068195, guid: 47cfc6ab84976c3468fe64226eb37f86, type: 3}
-    meleeEnemyPrefab: {fileID: 7088457593664486996, guid: b351315ea632814459c0a77db53e0d53, type: 3}
-    spawnEverywhere: 0
-    minPerRoom: 5
-    maxPerRoom: 10
-    spawnChancePerRoom: 50
-    rangedEnemyRatio: 40
 --- !u!4 &565522088
 Transform:
   m_ObjectHideFlags: 0
@@ -13877,57 +13816,6 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
---- !u!1 &1479278625
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1479278627}
-  - component: {fileID: 1479278628}
-  m_Layer: 0
-  m_Name: PoolManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1479278627
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1479278625}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1479278628
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1479278625}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08108eb1b45f6ce45a3fe28c24170338, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  projectilePoolSize: 50
-  meleeEnemyPoolSize: 15
-  rangedEnemyPoolSize: 15
-  expandablePools: 1
-  projectilePrefab: {fileID: -7078372348431027741, guid: 3b504d97bc4e6bc4c93be225376f57a7, type: 3}
-  meleeEnemyPrefab: {fileID: 896362944052102481, guid: b351315ea632814459c0a77db53e0d53, type: 3}
-  rangedEnemyPrefab: {fileID: 6909136222882696512, guid: 47cfc6ab84976c3468fe64226eb37f86, type: 3}
 --- !u!1 &1508963820
 GameObject:
   m_ObjectHideFlags: 0
@@ -14071,7 +13959,6 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 88e5552c4c5414c41bd9a2500e816629, type: 2}
     spawnTile: {fileID: 11400000, guid: 4820b1131e605564f9486a5de89a04c2, type: 2}
     levelExitTile: {fileID: 11400000, guid: 53653df792910ff42ac256a2b381fe59, type: 2}
-  enemySpawner: {fileID: 184745498}
   floorTileMap: {fileID: 466769964}
   wallTileMap: {fileID: 1078913441}
   trapTileMap: {fileID: 308154340}
@@ -14137,5 +14024,3 @@ SceneRoots:
   - {fileID: 1545065530}
   - {fileID: 1508963821}
   - {fileID: 565522088}
-  - {fileID: 184745497}
-  - {fileID: 1479278627}

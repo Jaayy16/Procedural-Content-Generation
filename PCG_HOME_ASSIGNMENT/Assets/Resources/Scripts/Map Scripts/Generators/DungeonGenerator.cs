@@ -2,8 +2,8 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using NUnit.Framework;
+using ProceduralDungeon.Combat;
 using ProceduralDungeon.Settings;
-using ProceduralDungeon.Spawning;
 using Sirenix.OdinInspector;
 using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
@@ -24,9 +24,6 @@ namespace ProceduralDungeon.Generator
         //Biome Generation Call
         private BiomeGenerator biomeGenerator;
         private List<BiomeType> roomBiomesCache = new  List<BiomeType>();
-
-        [Header("Enemy Settings")] [FoldoutGroup("Enemies")] [SerializeField]
-        private GridBasedSpawner enemySpawner;
         
         //Tilemaps and Settings
         [Header("Dungeon Generation")]
@@ -133,6 +130,7 @@ namespace ProceduralDungeon.Generator
         [Button("Generate Dungeon")]
         public void GenerateDungeon()
         {
+            
             floorTileMap.ClearAllTiles();
             wallTileMap.ClearAllTiles();
             decorationTileMap.ClearAllTiles();
@@ -164,7 +162,6 @@ namespace ProceduralDungeon.Generator
             
             GenerateDecorations(rooms, tileData);
             
-            SpawnEnemiesInRooms(rooms, tileData);
         }
 
         [Button("Reset Dungeon")]
@@ -721,29 +718,11 @@ namespace ProceduralDungeon.Generator
             return combined;
         }
 
-        ///<Summary>s
+        ///<Summary>
         /// Enemy Spawning Below
         /// <Summary>
 
-        //Spawns enemies in random rooms
-        public void SpawnEnemiesInRooms(List<Room> rooms, bool[,] floorTileData)
-        {
-            if (enemySpawner == null)
-            {
-                Debug.LogError("[SPAWNER] GridBasedSpawner not assigned!s");
-                return;
-            }
-            
-            for (int i = 0; i < rooms.Count; i++)
-            {
-                Room room = rooms[i];
-
-                if (room.isSpawnRoom || room.isEndRoom) continue;
-                
-                Rect roomBounds = new Rect(room.x, room.y, room.width, room.height);
-                enemySpawner.SpawnEnemiesGridBased(i, roomBounds, floorTileData);
-            }
-    }
         
+
     }
 }

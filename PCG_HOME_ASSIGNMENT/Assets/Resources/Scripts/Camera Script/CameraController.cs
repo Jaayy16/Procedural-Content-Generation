@@ -1,6 +1,5 @@
 using ProceduralDungeon.Combat;
 using ProceduralDungeon.Generator;
-using ProceduralDungeon.Player;
 using ProceduralDungeon.Settings;
 using UnityEngine;
 
