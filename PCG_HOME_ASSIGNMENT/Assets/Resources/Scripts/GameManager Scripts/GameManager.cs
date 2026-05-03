@@ -23,23 +23,46 @@ public class GameManager : MonoBehaviour
     [SerializeField] private DungeonGenerator dungeonGenerator;    
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private DungeonSettings dungeonSettings;
+    
+    // delete this
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        Debug.Log("[GM] ===== START METHOD CALLED =====");
+    
         if (dungeonGenerator != null)
         {
-            Debug.Log($"Generating Dungeon");
+            Debug.Log($"[GM] Generating Dungeon");
             dungeonGenerator.GenerateDungeon();
-            
+            Debug.Log($"[GM] Dungeon generation complete");
+        
+            Debug.Log($"[GM] About to spawn enemies");
             SpawnEnemiesInRooms();
+            Debug.Log($"[GM] Enemy spawning complete");
+        }
+        else
+        {
+            Debug.LogError("[GM] DungeonGenerator is NULL!");
         }
 
+        Debug.Log("[GM] About to start coroutine");
         StartCoroutine(SpawnWhenWorldReady());
+        Debug.Log("[GM] Coroutine started");
     }
-
+    
     private void SpawnEnemiesInRooms()
     {
+        Debug.Log("[GM] ===== SPAWN ENEMIES IN ROOMS START =====");
+    
+        if (enemySpawner == null)
+        {
+            Debug.LogError("[GM] Enemy spawner is NULL!");
+            return;
+        }
+        Debug.Log("[GM] Enemy spawner assigned");
+
+        // delete above
+        
         if (enemySpawner == null)
         {
             Debug.LogError("[GM] enemy spawner not assigned!");
@@ -60,8 +83,6 @@ public class GameManager : MonoBehaviour
             return;
         }
         
-        Debug.Log($"[GM] Spawning Enemies in {rooms.Count} rooms");
-
         for (int i = 0; i < rooms.Count; i++)
         {
             DungeonGenerator.Room currentRoom = rooms[i];
@@ -75,6 +96,9 @@ public class GameManager : MonoBehaviour
             
             enemySpawner.SpawnEnemiesInRoom(roomBounds);
         }
+        
+        Debug.Log($"[GM] Spawning Enemies in {rooms.Count} rooms");
+        
     }
     
     private IEnumerator SpawnWhenWorldReady()
@@ -168,5 +192,16 @@ public class GameManager : MonoBehaviour
         }
         
         cameraController.SetPlayerTransform(playerTransform);
+    }
+    
+    public void ApplyDifficultyScaling(float difficultyMultiplier)
+    {
+        BaseEnemy[] allEnemies = FindObjectsByType<BaseEnemy>(FindObjectsSortMode.InstanceID);
+
+        foreach (BaseEnemy enemy in allEnemies)
+        {
+            Debug.Log($"[SPAWNER] Applied Difficulty {difficultyMultiplier}x");
+        }
+            
     }
 }

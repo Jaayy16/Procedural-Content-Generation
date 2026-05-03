@@ -17,78 +17,76 @@ namespace ProceduralDungeon.Enemy
         [SerializeField] private Tilemap floorTilemap;
 
         private int totalEnemiesSpawned;
+        
         public void SpawnEnemiesInRoom(Rect roomBounds)
         {
-            if (meleeEnemyPrefab == null || rangedEnemyPrefab == null)
-            {
-                Debug.LogError("No enemy prefabs in spawner");
-                return;
-            }
+            if (!ValidAssignment()) return;
             
             int enemyCount = Random.Range(minEnemiesPerRoom, maxEnemiesPerRoom + 1);
-            
+        
             for (int i = 0; i < enemyCount; i++)
             {
-                Vector3 spawnPos = GetRandomSpawnPosInRoom(roomBounds);
-
-                if (spawnPos == Vector3.zero)
-                {
-                    continue;
-                }
-
+                Vector3 spawnPos = GetRandomFloorTileInRoom(roomBounds);
+        
+                if (spawnPos == Vector3.zero) continue;
+        
                 bool isRanged = Random.value < rangedEnemyRatio;
-
-                GameObject enemyPrefab = isRanged ? rangedEnemyPrefab : meleeEnemyPrefab;
-                GameObject spawnedEnemy = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
-
+                GameObject prefab = isRanged ? rangedEnemyPrefab : meleeEnemyPrefab;
+                
+                GameObject spawnedEnemy = Instantiate(prefab, spawnPos, Quaternion.identity);
+        
                 BaseEnemy enemyComponent = spawnedEnemy.GetComponent<BaseEnemy>();
-
+        
                 if (enemyComponent != null)
                 {
                     string enemyType = isRanged ? "Ranged" : "Melee";
                     spawnedEnemy.name = $"{enemyType}Enemy_{totalEnemiesSpawned}";
                     
-                    Debug.Log($"[SPAWNER] ✓ Spawned {enemyType} enemy: {spawnedEnemy.name} at {spawnPos}");
                     totalEnemiesSpawned++;
                 }
                 else
                 {
                     Destroy(spawnedEnemy);
                 }
-
             }
         }
 
-        private Vector3 GetRandomSpawnPosInRoom(Rect roomBounds)
+        private Vector3 GetRandomFloorTileInRoom(Rect roomBounds)
         {
+            Debug.Log($"[SPAWNER] GET RANDOM SPAWN POS CALLED with bounds: {roomBounds}");
+
+            //delete the above
+            
             for (int attempts = 0; attempts < 10; attempts++)
             {
-                float xRand = Random.Range(roomBounds.xMin + 0.5f, roomBounds.xMax - 0.5f);
-                float yRand = Random.Range(roomBounds.yMin + 0.5f, roomBounds.yMax- 0.5f);
-
+                float xRand = Random.Range(roomBounds.xMin + 1f, roomBounds.xMax - 1f);
+                float yRand = Random.Range(roomBounds.yMin + 1f, roomBounds.yMax - 1f);
                 Vector3 randomPos = new Vector3(xRand, yRand, 0f);
-
+                
                 Vector3Int cellPos = floorTilemap.WorldToCell(randomPos);
+                
+                cellPos = new Vector3Int(cellPos.x, cellPos.y, 0);
+                
                 TileBase tile = floorTilemap.GetTile(cellPos);
 
-                if (tile != null)
+                if (tile != null) 
                 {
-                    return floorTilemap.CellToWorld(cellPos) + new Vector3(0.5f, 0.5f, 0f);
+                    Vector3 worldPos = floorTilemap.CellToWorld(cellPos) + new Vector3(0.5f, 0.5f, 0f);
+                    return worldPos;
                 }
             }
-            
-            return Vector3.zero;
+            return Vector3Int.zero;
         }
 
-        public void ApplyDifficultyScaling(float difficultyMultiplier)
+        private bool ValidAssignment()
         {
-            BaseEnemy[] allEnemies = FindObjectsByType<BaseEnemy>(FindObjectsSortMode.InstanceID);
-
-            foreach (BaseEnemy enemy in allEnemies)
-            {
-                Debug.Log($"[SPAWNER] Applied Difficulty {difficultyMultiplier}x");
-            }
+            if(meleeEnemyPrefab == null) return false;
             
+            if(rangedEnemyPrefab == null) return false;
+            
+            if(floorTilemap == null) return false;
+            
+            return true;
         }
 
         public int GetTotalEnemiesSpawned()
