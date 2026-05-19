@@ -13,7 +13,7 @@ namespace ProceduralDungeon.Items
 
         void Awake()
         {
-            if (instance == null)
+            if (instance != null)
             {
                 instance = this;
             }

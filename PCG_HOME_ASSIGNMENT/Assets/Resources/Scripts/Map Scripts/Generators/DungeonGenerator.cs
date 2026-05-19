@@ -18,6 +18,14 @@ namespace ProceduralDungeon.Generator
         [FoldoutGroup("Settings")]
         [SerializeField] private DungeonSettings dungeonSettings;
 
+        //Secret Room
+        private SecretRoomGenerator secretRoomGenerator;
+        
+        //Vegetation
+        private VegitationGenerator vegetationGenerator;
+        private VegetationRenderer vegetationRenderer;
+        private bool[,] lastTileData;
+        
         //Perlin-noise generated call
         private TileVarianceGenerator varianceGenerator;
         
@@ -157,6 +165,8 @@ namespace ProceduralDungeon.Generator
 
             bool[,] tileData = PaintDungeonTiles(generatedRooms);
 
+            lastTileData = tileData;
+            
             if (dungeonSettings.EnableBiomes)
             {
                 ApplyRoomBiomes(generatedRooms);
@@ -165,6 +175,18 @@ namespace ProceduralDungeon.Generator
             
             GenerateDecorations(generatedRooms, tileData);
 
+            if (dungeonSettings.EnableVegetation)
+            {
+                vegetationGenerator = new VegitationGenerator(dungeonSettings, seedToUse, biomeGenerator);
+                vegetationGenerator.InitializeVeg(generatedRooms, decorationTileMap, biomeTileMap, tileData);
+
+                if (vegetationRenderer == null)
+                {
+                    vegetationRenderer = gameObject.AddComponent<VegetationRenderer>();
+                    vegetationRenderer.SetVegetationGenerator(vegetationGenerator);
+                }
+            }
+            
             CornerTileGenerator cornerTileGenerator = new CornerTileGenerator(dungeonSettings);
             cornerTileGenerator.GenerateCornerTiles(generatedRooms, wallTileMap);
 
@@ -180,6 +202,9 @@ namespace ProceduralDungeon.Generator
             ChestGenerator chestGenerator = new ChestGenerator(dungeonSettings, seedToUse);
             chestGenerator.GenerateChestsInDungeon(generatedRooms, floorTileMap, dungeonSettings.ChestPrefab, tileData);
 
+            secretRoomGenerator = new SecretRoomGenerator(dungeonSettings, seedToUse);
+            secretRoomGenerator.GenerateSecretRoomsEntrance(generatedRooms, wallTileMap, floorTileMap, tileData);
+            
         }
 
         [Button("Reset Dungeon")]
@@ -200,7 +225,20 @@ namespace ProceduralDungeon.Generator
                 Debug.Log("Dungeon Tilemap is null");
             }
         }
+
+        public SecretRoomGenerator GetSecretRooms()
+        {
+            return secretRoomGenerator;
+        }
         
+        private void Update()
+        {
+            if (vegetationRenderer != null && dungeonSettings.EnableVegetation && lastTileData != null)
+            {
+                vegetationGenerator.UpdateVeg(Time.deltaTime, decorationTileMap, lastTileData);
+            }
+        }
+
         //Generates rooms in a linear position to each other 
         private List<Room> GenerateRooms(int seed)
         {

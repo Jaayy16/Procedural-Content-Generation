@@ -53,6 +53,18 @@ namespace ProceduralDungeon.Settings
         [FoldoutGroup("Corridor Generation")] [SerializeField]
         private int corridorWidth = 5;
 
+        /// <summary>
+        /// Vegetation Settings 
+        /// </summary>
+        
+        [FoldoutGroup("Vegetation Settings")] [SerializeField]
+        private bool enableVegetation = true;
+        
+        [FoldoutGroup("Vegetation Settings")] [SerializeField]
+        private TileBase[] mossTiles = new TileBase[3];
+        
+        [FoldoutGroup("Vegetation Settings")] [SerializeField]
+        private TileBase[] vineTiles = new TileBase[3];
                 
         ///<summary>
         /// Chest Settings
@@ -121,7 +133,7 @@ namespace ProceduralDungeon.Settings
         
         [FoldoutGroup("Tile Variance")] [SerializeField, Range(0, 1)]
         private float varianceThreshold = 0.5f;
-
+        
         ///<summary>
         ///Contextual Tile Variance
         /// </summary>
@@ -164,6 +176,22 @@ namespace ProceduralDungeon.Settings
         private TileBase[] moltenTiles = new TileBase[1];
         
         /// <summary>
+        /// Secret Room Settings 
+        /// </summary>
+
+        [FoldoutGroup("Secret Room Settings")] [SerializeField] 
+        private bool enableSecretRoom = true;
+
+        [FoldoutGroup("Secret Room Settings")] [SerializeField]
+        private int maxSecretRooms = 2;
+
+        [FoldoutGroup("Secret Room Settings")] [SerializeField]
+        private TileBase secretRoomEntranceTile;
+
+        [FoldoutGroup("Secret Room Settings")] [SerializeField]
+        private float secretRoomChance = 0.3f;
+        
+        /// <summary>
         /// Tile Refrences 
         /// </summary>
 
@@ -190,10 +218,12 @@ namespace ProceduralDungeon.Settings
             seed = newSeed;
         }
         
-        /// <summary>
-        ///  Public Properties
-        /// <summary>
-        
+        //Pass Secret Room-Related Variables
+        public bool EnableSecretRoom => enableSecretRoom;
+        public int MaxSecretRooms => maxSecretRooms;
+        public TileBase SecretRoomEntranceTile => secretRoomEntranceTile;
+        public float SecretRoomChance => secretRoomChance;
+
         //Pass Dungeon-Related Variables
         public int DungeonWidth  => dungeonWidth;
         public int DungeonHeight => dungeonHeight;
@@ -209,6 +239,11 @@ namespace ProceduralDungeon.Settings
         //Pass Corridor-Related Variables
         public int CorridorWidth => corridorWidth;
         
+        //Pass Vegetation-Related Variables
+        public bool EnableVegetation => enableVegetation;
+        public TileBase[] MossTiles => mossTiles;
+        public TileBase[] VineTiles => vineTiles;
+
         //Pass Contextual Tile Variables
         public bool EnableContextualTiling => enableContextualTiling;
         public TileBase CornerTile => cornerTile;

@@ -12,6 +12,13 @@ namespace ProceduralDungeon.Generator
         Flooded,
         Molten
     }
+
+    public enum VegetationType
+    {
+        None,
+        Moss,
+        Vines
+    }
     
     public class BiomeGenerator
     {

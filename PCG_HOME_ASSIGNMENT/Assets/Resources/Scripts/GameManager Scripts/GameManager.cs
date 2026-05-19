@@ -5,6 +5,8 @@ using ProceduralDungeon.Enemy;
 using UnityEngine;
 using ProceduralDungeon.Generator;
 using ProceduralDungeon.Items;
+using ProceduralDungeon.Managers;
+using ProceduralDungeon.Map;
 using ProceduralDungeon.Settings;
 using UnityEngine.Tilemaps;
 using ProceduralDungeon.Player;
@@ -34,8 +36,7 @@ public class GameManager : MonoBehaviour
     {
         if (difficultyManager == null)
         {
-            Debug.LogError("Difficulty manager is not assigned!");
-            return;
+            difficultyManager = GetDifficultyManager();
         }
 
         if (difficultyManager == null)
@@ -46,7 +47,7 @@ public class GameManager : MonoBehaviour
         
         if (itemManager == null)
         {
-            itemManager = FindObjectOfType<ItemManager>();
+            itemManager = GetItemManager();
         }
 
         if (itemManager == null)
@@ -69,6 +70,18 @@ public class GameManager : MonoBehaviour
         StartCoroutine(SpawnWhenWorldReady());
     }
 
+    private ItemManager GetItemManager()
+    {
+        var managers = UnityEngine.Object.FindObjectsByType<ItemManager>(FindObjectsSortMode.None);
+        return managers.Length > 0 ? managers[0] : null;
+    }
+    
+    private DifficultyManager GetDifficultyManager()
+    {
+        var managers = UnityEngine.Object.FindObjectsByType<DifficultyManager>(FindObjectsSortMode.None);
+        return managers.Length > 0 ? managers[0] : null;
+    }
+    
     private void SpawnEnemiesInRooms()
     {
         if (enemySpawner == null)
@@ -165,6 +178,10 @@ public class GameManager : MonoBehaviour
             Debug.LogError("Player controller cannot be found or instantiated!");
         }
 
+        SecretRoomTrigger secretRoomTrigger =
+            wallTilemap.gameObject.AddComponent<ProceduralDungeon.Map.SecretRoomTrigger>();
+        secretRoomTrigger.SetSecretRoomGenerator(dungeonGenerator.GetSecretRooms());
+        
         Debug.Log($"Player Spawned at {spawnWorldPos}");
         return playerInstance;
     }
