@@ -144,7 +144,7 @@ namespace ProceduralDungeon.Generator
             varianceGenerator = new TileVarianceGenerator(dungeonSettings, seedToUse);
             biomeGenerator = new BiomeGenerator(dungeonSettings, seedToUse);
             
-            generatedRooms = GenerateRooms();
+            generatedRooms = GenerateRooms(seedToUse);
             Debug.Log($"Generated {generatedRooms.Count} rooms");
 
             if (dungeonSettings.EnableBiomes)
@@ -202,10 +202,10 @@ namespace ProceduralDungeon.Generator
         }
         
         //Generates rooms in a linear position to each other 
-        private List<Room> GenerateRooms()
+        private List<Room> GenerateRooms(int seed)
         {
             List<Room> rooms = new List<Room>();
-            System.Random rng = new System.Random(dungeonSettings.Seed);
+            System.Random rng = new System.Random(seed);
 
             int spawnW = rng.Next(dungeonSettings.MinRoomWidth, dungeonSettings.MaxRoomWidth + 1);
             int spawnH = rng.Next(dungeonSettings.MinRoomHeight, dungeonSettings.MaxRoomHeight + 1);

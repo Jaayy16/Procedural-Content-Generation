@@ -8,28 +8,42 @@ using ProceduralDungeon.Items;
 using ProceduralDungeon.Settings;
 using UnityEngine.Tilemaps;
 using ProceduralDungeon.Player;
+using UnityEngine.Rendering.VirtualTexturing;
 
 public class GameManager : MonoBehaviour
-{    
-    [SerializeField] private Camera mainCamera; 
+{
+    [SerializeField] private Camera mainCamera;
     [SerializeField] private GameObject playerPrefab;
-    
+
     [SerializeField] Tilemap portalTileMap;
     [SerializeField] Tilemap floorTilemap;
     [SerializeField] Tilemap wallTilemap;
     [SerializeField] Tilemap decorationTilemap;
     [SerializeField] Tilemap trapTilemap;
     [SerializeField] Tilemap biomeTileMap;
-    
-    [SerializeField] private DungeonGenerator dungeonGenerator;    
+
+    [SerializeField] private DungeonGenerator dungeonGenerator;
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private DungeonSettings dungeonSettings;
-    
+
+    [SerializeField] private ProceduralDungeon.Managers.DifficultyManager difficultyManager;
     [SerializeField] private ItemManager itemManager;
 
-    
+
     void Start()
     {
+        if (difficultyManager == null)
+        {
+            Debug.LogError("Difficulty manager is not assigned!");
+            return;
+        }
+
+        if (difficultyManager == null)
+        {
+            GameObject difficultyManagerObj = new GameObject("DifficultyManager");
+            difficultyManager = difficultyManagerObj.AddComponent<ProceduralDungeon.Managers.DifficultyManager>();
+        }
+        
         if (itemManager == null)
         {
             itemManager = FindObjectOfType<ItemManager>();
@@ -40,11 +54,11 @@ public class GameManager : MonoBehaviour
             GameObject itemManagerObj = new GameObject("ItemManager");
             itemManager = itemManagerObj.AddComponent<ItemManager>();
         }
-        
+
         if (dungeonGenerator != null)
         {
             dungeonGenerator.GenerateDungeon(dungeonSettings.Seed);
-        
+
             SpawnEnemiesInRooms();
         }
         else
@@ -54,7 +68,7 @@ public class GameManager : MonoBehaviour
 
         StartCoroutine(SpawnWhenWorldReady());
     }
-    
+
     private void SpawnEnemiesInRooms()
     {
         if (enemySpawner == null)
@@ -73,25 +87,25 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
-        
+
         for (int i = 1; i < rooms.Count - 1; i++)
         {
             DungeonGenerator.Room currentRoom = rooms[i];
             Rect roomBounds = new Rect(currentRoom.x, currentRoom.y, currentRoom.width, currentRoom.height);
-            
+
             if (currentRoom.isSpawnRoom || currentRoom.isEndRoom)
             {
                 continue;
             }
-            
+
             enemySpawner.SpawnEnemiesInRoom(roomBounds, i);
         }
     }
-    
+
     private IEnumerator SpawnWhenWorldReady()
     {
         yield return new WaitForEndOfFrame();
-        
+
         GameObject playerInstance = SpawnPlayer();
 
         if (playerInstance != null)
@@ -99,7 +113,7 @@ public class GameManager : MonoBehaviour
             SetupCamera(playerInstance.transform);
         }
     }
-    
+
     private GameObject SpawnPlayer()
     {
         if (playerPrefab == null || portalTileMap == null)
@@ -116,7 +130,7 @@ public class GameManager : MonoBehaviour
         BoundsInt bounds = portalTileMap.cellBounds;
         Vector3 spawnWorldPos = Vector3.zero;
         bool foundSpawn = false;
-        
+
         foreach (Vector3Int pos in bounds.allPositionsWithin)
         {
             TileBase tile = portalTileMap.GetTile(pos);
@@ -134,9 +148,9 @@ public class GameManager : MonoBehaviour
             Debug.LogError("No Spawn tile found!");
             return null;
         }
-        
+
         GameObject playerInstance = Instantiate(playerPrefab, spawnWorldPos, Quaternion.identity);
-        
+
         PlayerController playerController = playerInstance.GetComponent<PlayerController>();
 
         if (playerController != null)
@@ -150,7 +164,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogError("Player controller cannot be found or instantiated!");
         }
-        
+
         Debug.Log($"Player Spawned at {spawnWorldPos}");
         return playerInstance;
     }
@@ -161,29 +175,29 @@ public class GameManager : MonoBehaviour
 
         if (combat == null)
         {
-            combat =  playerTransform.gameObject.AddComponent<PlayerCombat>();
+            combat = playerTransform.gameObject.AddComponent<PlayerCombat>();
         }
-        
+
         Debug.Log("[GM] Player combat Initialized");
     }
-    
+
     private void SetupCamera(Transform playerTransform)
     {
         if (mainCamera == null)
         {
             mainCamera = Camera.main;
         }
-        
+
         CameraController cameraController = mainCamera.GetComponent<CameraController>();
-        
+
         if (cameraController != null)
         {
             cameraController = mainCamera.gameObject.AddComponent<CameraController>();
         }
-        
+
         cameraController.SetPlayerTransform(playerTransform);
     }
-    
+
     public void ApplyDifficultyScaling(float difficultyMultiplier)
     {
         BaseEnemy[] allEnemies = FindObjectsByType<BaseEnemy>(FindObjectsSortMode.InstanceID);
@@ -192,12 +206,16 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log($"[SPAWNER] Applied Difficulty {difficultyMultiplier}x");
         }
-            
     }
 
     public void GenerateNewDungeon(int? customSeed = null)
     {
         Debug.Log("Generating new dungeon");
+
+        if (difficultyManager != null)
+        {
+            difficultyManager.IncrementDungeonLevel();
+        }
         
         int currentSeed = dungeonSettings.Seed;
         int newSeed;
@@ -205,10 +223,10 @@ public class GameManager : MonoBehaviour
         do
         {
             newSeed = Random.Range(0, 1000000);
-        }while (newSeed == currentSeed);
+        } while (newSeed == currentSeed);
 
         dungeonSettings.SetSeed(newSeed);
-        
+
         if (enemySpawner != null)
         {
             dungeonGenerator.ResetDungeon();
@@ -221,7 +239,7 @@ public class GameManager : MonoBehaviour
 
         if (dungeonGenerator != null)
         {
-            dungeonGenerator.GenerateDungeon();
+            dungeonGenerator.GenerateDungeon(newSeed);
             SpawnEnemiesInRooms();
         }
 
@@ -236,7 +254,7 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
-        
+
         BoundsInt bounds = portalTileMap.cellBounds;
 
         foreach (Vector3Int pos in bounds.allPositionsWithin)
@@ -251,8 +269,7 @@ public class GameManager : MonoBehaviour
                 return;
             }
         }
-        
+
         Debug.LogError("No Spawn tile found!");
     }
-
 }

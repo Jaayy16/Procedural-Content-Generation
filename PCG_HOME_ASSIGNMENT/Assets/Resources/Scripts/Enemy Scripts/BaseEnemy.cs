@@ -8,9 +8,19 @@ namespace ProceduralDungeon.Enemy
         [Header("Base Stats")]
         [SerializeField] protected float maxHealth = 40f;
         [SerializeField] protected float moveSpeed = 3f;
+        [SerializeField] protected float damage = 4f;
         
         [SerializeField] private GameObject keyPrefab;
         [SerializeField] private float keyDropChance = 0.3f;
+        
+        [Header("Difficulty Scaling")]
+        [SerializeField] private float baseDamage = 5f;
+        [SerializeField] private float baseSpeed = 2f;
+        [SerializeField] private float baseHealth = 20f;
+
+        private float scaledHealth;
+        private float scaledSpeed;
+        private float scaledDamage;
         
         protected float currentHealth;
         protected Rigidbody2D rb;
@@ -36,6 +46,8 @@ namespace ProceduralDungeon.Enemy
             }
             
             currentHealth = maxHealth;
+
+            ApplyDifficultyScaling();
         }
 
         // Update is called once per frame
@@ -53,9 +65,26 @@ namespace ProceduralDungeon.Enemy
             }
         }
 
-        protected abstract void OnPlayerDetected();
-        protected abstract void OnPlayerNotDetected();
+        private void ApplyDifficultyScaling()
+        {
+            ProceduralDungeon.Managers.DifficultyManager difficultyMgr =
+                ProceduralDungeon.Managers.DifficultyManager.Instance;
 
+            if (difficultyMgr != null)
+            {
+                float multiplier = difficultyMgr.GetDifficultyMultiplier();
+                
+                maxHealth = baseHealth * multiplier;
+                currentHealth = maxHealth;
+                damage = baseDamage * multiplier;
+                moveSpeed  = baseSpeed * multiplier;
+            }
+        }
+        
+        protected abstract void OnPlayerDetected();
+        
+        protected abstract void OnPlayerNotDetected();
+        
         protected void RotateTowards(Vector2 direction)
         {
             if (direction.magnitude < 0.01f) return;
@@ -63,7 +92,7 @@ namespace ProceduralDungeon.Enemy
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         }
-
+        
         public virtual void TakeDamage(float damage)
         {
             if(!isAlive) return;
@@ -77,7 +106,9 @@ namespace ProceduralDungeon.Enemy
         }
         
         public virtual float GetHealth() => currentHealth;
+        
         public virtual Transform GetTransform() => transform;
+        
         public virtual bool IsAlive() => isAlive;
 
         protected virtual void Die()

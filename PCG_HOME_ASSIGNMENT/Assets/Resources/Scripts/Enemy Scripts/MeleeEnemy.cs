@@ -10,6 +10,12 @@ namespace ProceduralDungeon.Enemy
         [SerializeField] protected float atkRange = 0.8f;
         [SerializeField] protected float atkCooldown = 1f;
         
+        [Header("Difficulty Scaling")]
+        [SerializeField] private float baseDamage = 5f;
+        [SerializeField] private float baseSpeed = 2f;
+        [SerializeField] private float baseHealth = 20f;
+
+        
         private float lastAtkTime = 0f;
 
         protected override void OnPlayerDetected()
