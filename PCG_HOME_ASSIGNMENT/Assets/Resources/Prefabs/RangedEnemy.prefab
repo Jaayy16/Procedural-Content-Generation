@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 3772428331586068195}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 40, y: 150, z: -4}
+  m_LocalPosition: {x: 40, y: 150, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -182,6 +182,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 40
   moveSpeed: 3
+  keyPrefab: {fileID: 4169735898061699633, guid: 03aea47c9b362554ba4409a94d1a5275, type: 3}
+  keyDropChance: 0.3
   projectilePrefab: {fileID: 7832230423321154636, guid: fed6a5522b8dd1046b20b6c0f0add101, type: 3}
   shootPoint: {fileID: 0}
   shotCooldown: 1.5

@@ -24,6 +24,8 @@ namespace ProceduralDungeon.Enemy
             {
                 shootPoint = transform;
             }
+            
+            lastShotTime = Time.time;
         }
 
         protected override void OnPlayerDetected()
@@ -50,7 +52,7 @@ namespace ProceduralDungeon.Enemy
                 rb.linearVelocity = Vector2.zero;
             }
 
-            if (Time.time - lastShotTime > shotCooldown)
+            if (Time.time - lastShotTime >= shotCooldown)
             {
                 ShootAtPlayer(playerTransform);
                 lastShotTime = Time.time;
@@ -81,7 +83,7 @@ namespace ProceduralDungeon.Enemy
             }
             else
             {
-                Debug.LogError("[Ranged] projectile prefav missing projectile component!");
+                Debug.LogError("[Ranged] projectile prefab missing projectile component!");
             }
         }
     }

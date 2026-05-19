@@ -9,6 +9,9 @@ namespace ProceduralDungeon.Enemy
         [SerializeField] protected float maxHealth = 40f;
         [SerializeField] protected float moveSpeed = 3f;
         
+        [SerializeField] private GameObject keyPrefab;
+        [SerializeField] private float keyDropChance = 0.3f;
+        
         protected float currentHealth;
         protected Rigidbody2D rb;
         protected EnemyDetection detection;
@@ -80,6 +83,12 @@ namespace ProceduralDungeon.Enemy
         protected virtual void Die()
         {
             isAlive = false;
+
+            if (Random.value < keyDropChance && keyPrefab != null)
+            {
+                GameObject key = Instantiate(keyPrefab, transform.position, Quaternion.identity);
+            }
+            
             Destroy(gameObject);
         }
     }

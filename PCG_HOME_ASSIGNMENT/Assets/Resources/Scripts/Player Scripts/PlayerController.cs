@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using ProceduralDungeon.Combat;
 using ProceduralDungeon.Generator;
+using ProceduralDungeon.Settings;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using UnityEngine.SceneManagement;
@@ -8,39 +10,48 @@ using UnityEngine.Tilemaps;
 
 namespace ProceduralDungeon.Player
 {
-
     public class PlayerController : MonoBehaviour, IAttackable
     {
+        [SerializeField] private DungeonGenerator dungeonGenerator;
+        [SerializeField] private DungeonSettings dungeonSettings;
+        [SerializeField] private GameManager gameManager;
+        
         [Header("Movement Settings")] [SerializeField, Range(0, 20)]
         private float movementSpeed = 5f;
 
         [SerializeField] private float waterSlowMultiplier = 0.25f;
 
-        [Header("TileMaps")] 
-        [SerializeField] private Tilemap wallTilemap;
+        [Header("TileMaps")] [SerializeField] private Tilemap wallTilemap;
         [SerializeField] private Tilemap floorTilemap;
         [SerializeField] private Tilemap decorationTilemap;
         [SerializeField] private Tilemap portalTilemap;
         [SerializeField] private Tilemap biomeTileMap;
+        [SerializeField] private Tilemap trapTileMap;
 
-        [Header("Object To Detect")] 
-        [SerializeField] private TileBase[] waterTiles;
+        [Header("Trap Detection")] [SerializeField]
+        private TileBase[] trapTiles;
+
+        private float lastTrapTriggerTime = 0f;
+
+        [Header("Object To Detect")] [SerializeField]
+        private TileBase[] waterTiles;
+
         [SerializeField] private TileBase[] lavaTiles;
-                
-        [Header("Lava Settings")] [SerializeField , Range(0,5)]
-        private float lavaDmgPerSecond =1f;
-                
+
+        [Header("Lava Settings")] [SerializeField, Range(0, 5)]
+        private float lavaDmgPerSecond = 1f;
+
         [SerializeField] private float gridCellSize = 1f;
-        
+
         private Vector2 inputDirection;
         private Rigidbody2D rb;
         private float currentSpeed;
-        
+
         private bool isOnWater = false;
         private bool isOnLava = false;
         private float lavaDmgTimer = 0f;
         private BiomeType currentBiome = BiomeType.Normal;
-        
+
         private float playerHealth = 100f;
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -71,6 +82,11 @@ namespace ProceduralDungeon.Player
             {
                 biomeTileMap = GameObject.Find("Biomes").GetComponent<Tilemap>();
             }
+
+            if (trapTileMap == null)
+            {
+                trapTileMap = GameObject.Find("Traps").GetComponent<Tilemap>();
+            }
         }
 
         // Update is called once per frame
@@ -79,36 +95,39 @@ namespace ProceduralDungeon.Player
             inputDirection = GetInputMovement();
             CheckIfOnExit();
         }
-              
+
         private void FixedUpdate()
-              {
-                  if (rb == null) return;
-      
-                  Vector2 dir = rb.position + inputDirection * movementSpeed * Time.fixedDeltaTime;
-                  
-                  if (CanMoveTo(dir))
-                  {
-                      rb.linearVelocity = inputDirection * GetCurrentSpeed();
-                  }
-                  else
-                  {
-                      rb.linearVelocity = Vector2.zero;
-                  }
-      
-                  CheckWaterStatus();
-                  CheckLavaStatus();
-                  ApplyLavaDamage();
-              }
-                
+        {
+            if (rb == null) return;
+
+            Vector2 dir = rb.position + inputDirection * movementSpeed * Time.fixedDeltaTime;
+
+            if (CanMoveTo(dir))
+            {
+                rb.linearVelocity = inputDirection * GetCurrentSpeed();
+            }
+            else
+            {
+                rb.linearVelocity = Vector2.zero;
+            }
+
+            CheckWaterStatus();
+            CheckLavaStatus();
+            ApplyLavaDamage();
+            UpdateBiomeStatus();
+
+            CheckTrapStatus();
+        }
+
         //Movements functions
         private Vector2 GetInputMovement()
         {
-           Vector2 input = Vector2.zero;
-           
-           input.x = Input.GetAxisRaw("Horizontal");
-           input.y = Input.GetAxisRaw("Vertical");
-           
-           return input.normalized;
+            Vector2 input = Vector2.zero;
+
+            input.x = Input.GetAxisRaw("Horizontal");
+            input.y = Input.GetAxisRaw("Vertical");
+
+            return input.normalized;
         }
 
         private float GetCurrentSpeed()
@@ -127,6 +146,7 @@ namespace ProceduralDungeon.Player
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -146,28 +166,34 @@ namespace ProceduralDungeon.Player
 
         private void OnExitReached(TileBase tile)
         {
-            //For now, it will quit the application
-            Application.Quit();
-            Debug.Log("Exit Reached");
+              GameManager gameManager = FindObjectOfType<GameManager>();
+
+              if (gameManager != null)
+              {
+                  gameManager.GenerateNewDungeon();
+              }
+              else
+              {
+                  Debug.Log("No GameManager found");
+              }
         }
-        
+
         //Applies water slowness
         private void CheckWaterStatus()
         {
-            Vector3Int playerCell = floorTilemap.WorldToCell(transform.position);
+            Vector3Int playerCell = biomeTileMap.WorldToCell(transform.position);
             isOnWater = false;
 
             if (biomeTileMap != null)
             {
                 TileBase tile = biomeTileMap.GetTile(playerCell);
-                
-                if (tile != null && IsWaterTile(tile)) 
-                { 
+
+                if (tile != null && IsWaterTile(tile))
+                {
                     isOnWater = true;
                     return;
                 }
             }
-            
         }
 
         private bool IsWaterTile(TileBase tile)
@@ -176,16 +202,16 @@ namespace ProceduralDungeon.Player
 
             foreach (TileBase waterTile in waterTiles)
             {
-                if(tile == waterTile) return true;
+                if (tile == waterTile) return true;
             }
-            
+
             return false;
         }
-        
+
         //Applies lava Damage
         private void CheckLavaStatus()
         {
-            Vector3Int playerCell = floorTilemap.WorldToCell(transform.position);
+            Vector3Int playerCell = biomeTileMap.WorldToCell(transform.position);
             isOnLava = false;
 
             if (biomeTileMap != null)
@@ -202,13 +228,16 @@ namespace ProceduralDungeon.Player
 
         private bool IsLavaTile(TileBase tile)
         {
-            if(tile == null || lavaTiles == null) return false;
+            if (tile == null || lavaTiles == null)
+            {
+                return false;
+            }
 
             foreach (TileBase lavaTile in lavaTiles)
             {
                 if (tile == lavaTile) return true;
             }
-            
+
             return false;
         }
 
@@ -219,7 +248,7 @@ namespace ProceduralDungeon.Player
                 lavaDmgTimer = 0f;
                 return;
             }
-            
+
             lavaDmgTimer += Time.fixedDeltaTime;
 
             if (lavaDmgTimer >= 1f)
@@ -233,7 +262,6 @@ namespace ProceduralDungeon.Player
                     Die();
                 }
             }
-            
         }
 
         public void TakeDamage(float damage)
@@ -246,40 +274,101 @@ namespace ProceduralDungeon.Player
                 Die();
             }
         }
-        
+
         private void Die()
         {
             Debug.Log("Player Died");
-            
+
             Destroy(this.gameObject);
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         private void UpdateBiomeStatus()
         {
-            Vector3Int playerCell = biomeTileMap.WorldToCell(transform.position);
-            BiomeType detectedBiome = BiomeType.Normal;
-            
-            TileBase tile = biomeTileMap.GetTile(playerCell);
-
-            if (tile != null)
+            if (dungeonGenerator == null)
             {
-                if (IsLavaTile(tile))
+                Debug.LogWarning("DungeonGenerator is null in playercontroller");
+                return;
+            }
+
+            List<DungeonGenerator.Room> rooms = dungeonGenerator.GetGeneratedRooms();
+            BiomeType detectedBiome = BiomeType.Normal;
+
+            Vector3 playerPos = transform.position;
+
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                DungeonGenerator.Room room = rooms[i];
+
+                if (playerPos.x > room.x && playerPos.x < room.x + room.width && playerPos.y > room.y &&
+                    playerPos.y < room.y + room.height)
                 {
-                    detectedBiome = BiomeType.Molten;
-                }
-                else if (IsWaterTile(tile))
-                {
-                    detectedBiome = BiomeType.Flooded;
+                    detectedBiome = dungeonGenerator.GetBiome(i);
+                    break;
                 }
             }
-            
+
             currentBiome = detectedBiome;
         }
 
         public BiomeType GetCurrentBiome()
         {
             return currentBiome;
+        }
+
+        //Healing Function
+        public void Heal(float healAmount)
+        {
+            playerHealth += Mathf.Min(playerHealth + healAmount, 100);
+        }
+        
+        //Trap Functions
+
+        private void CheckTrapStatus()
+        {
+            Vector3Int playerCell = trapTileMap.WorldToCell(transform.position);
+            TileBase tile = trapTileMap.GetTile(playerCell);
+
+            if (tile != null && IsTrapTile(tile))
+            {
+                if (Time.time - lastTrapTriggerTime > dungeonSettings.TrapCooldown)
+                {
+                    TriggerTrap();
+                    lastTrapTriggerTime = Time.time;
+                }
+            }
+        }
+
+        private bool IsTrapTile(TileBase tile)
+        {
+            if (tile == null || trapTiles == null) return false;
+
+            foreach (TileBase trapTile in trapTiles)
+            {
+                if (tile == trapTile) return true;
+            }
+            
+            return false;
+        }
+
+        private void TriggerTrap()
+        {
+            playerHealth -= dungeonSettings.TrapDamage;
+
+            if (playerHealth <= 0)
+            {
+                Die();
+            }
+        }
+
+        public void SetDungeonGenerator(DungeonGenerator generator)
+        {
+            dungeonGenerator = generator;
+        }
+
+        public void SetGameManager(GameManager manager)
+        {
+            gameManager = manager;
         }
         
         public void SetTilemaps(Tilemap Floor, Tilemap Wall, Tilemap Decoration, Tilemap portal, Tilemap biome)
@@ -294,9 +383,13 @@ namespace ProceduralDungeon.Player
             {
                 portalTilemap = portal;
             }
-
         }
-    
+
+        public void SetTrapTiles(TileBase[] traps)
+        {
+            trapTiles = traps;
+        }
+        
         public bool GetIsOnWater() => isOnWater;
         public bool GetIsOnLava() => isOnLava;
         public float GetHealth() => playerHealth;

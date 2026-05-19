@@ -53,6 +53,33 @@ namespace ProceduralDungeon.Settings
         [FoldoutGroup("Corridor Generation")] [SerializeField]
         private int corridorWidth = 5;
 
+                
+        ///<summary>
+        /// Chest Settings
+        /// </summary>
+
+        [FoldoutGroup("Chest Settings")] [SerializeField]
+        private GameObject chestPrefab;
+        
+        /// <summary>
+        /// Trap Settings
+        /// </summary>
+
+        [FoldoutGroup("Trap Settings")] [SerializeField]
+        private bool enableTraps = true;
+        
+        [FoldoutGroup("Trap Settings")] [SerializeField]
+        private float trapChance = 0.1f;
+
+        [FoldoutGroup("Trap Settings")] [SerializeField]
+        private TileBase[] trapTiles = new TileBase[1];
+
+        [FoldoutGroup("Trap Settings")] [SerializeField]
+        private float trapDamage = 15f;
+
+        [FoldoutGroup("Trap Settings")] [SerializeField]
+        private float trapCooldown = 2f;
+
         /// <summary>
         /// Decoration Settings
         /// </summary>
@@ -94,7 +121,29 @@ namespace ProceduralDungeon.Settings
         
         [FoldoutGroup("Tile Variance")] [SerializeField, Range(0, 1)]
         private float varianceThreshold = 0.5f;
+
+        ///<summary>
+        ///Contextual Tile Variance
+        /// </summary>
+
+        [FoldoutGroup("Corner & Props Settings")] [SerializeField]
+        private bool enableContextualTiling = true;
+
+        [FoldoutGroup("Corner & Props Settings")] [SerializeField]
+        private TileBase cornerTile;
         
+        [FoldoutGroup("Corner & Props Settings")] [SerializeField]
+        private bool enableContextualProps = true;
+        
+        [FoldoutGroup("Corner & Props Settings")] [SerializeField]
+        private TileBase[] floodedProps = new TileBase[1];
+        
+        [FoldoutGroup("Corner & Props Settings")] [SerializeField]
+        private TileBase[] moltenProps = new TileBase[1];
+
+        [FoldoutGroup("Corner & Props Settings")] [SerializeField]
+        private float contextualPropChance = 0.2f;
+
         ///<summary>
         ///Biome Settings
         /// </summary>
@@ -136,6 +185,11 @@ namespace ProceduralDungeon.Settings
         [FoldoutGroup("Tile References")] [SerializeField]
         private TileBase levelExitTile;
         
+        public void SetSeed(int newSeed)
+        {
+            seed = newSeed;
+        }
+        
         /// <summary>
         ///  Public Properties
         /// <summary>
@@ -155,11 +209,35 @@ namespace ProceduralDungeon.Settings
         //Pass Corridor-Related Variables
         public int CorridorWidth => corridorWidth;
         
+        //Pass Contextual Tile Variables
+        public bool EnableContextualTiling => enableContextualTiling;
+        public TileBase CornerTile => cornerTile;
+        public bool EnableContextualProps => enableContextualProps;
+        public TileBase[] FloodedProps => floodedProps;
+        public TileBase[] MoltenProps => moltenProps;
+        public float ContextualPropChance => contextualPropChance;
+        
+        //Pass Chest-Related Variables
+        public GameObject ChestPrefab => chestPrefab;
+        
+        //Pass Trap-Related Variables
+        
+        public bool EnableTraps => enableTraps;
+        public float TrapChance => trapChance;
+        public TileBase[] TrapTiles => trapTiles;
+        public float TrapDamage => trapDamage;
+        public float TrapCooldown => trapCooldown;
+        
         //Pass Decoration-Related Variables
         public bool EnableDecoration => enableDecoration;
         public int MinDistFromCentre => minDistFromCentre;
         public float DecorationChance => decorationChance;
-        public int Seed => seed;
+
+        public int Seed
+        {
+            get => seed;
+            set => seed = value;
+        }
         
         //Pass Biome Related Variables
         public bool EnableBiomes => enableBiomes;
@@ -183,6 +261,6 @@ namespace ProceduralDungeon.Settings
         public TileBase[] DecorationTiles => decorationTiles;
         public TileBase SpawnTile => spawnTile;
         public TileBase LevelExitTile => levelExitTile;
-
+        
     }
 }

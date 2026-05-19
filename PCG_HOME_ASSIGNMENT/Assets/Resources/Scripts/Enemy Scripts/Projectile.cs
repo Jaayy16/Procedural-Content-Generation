@@ -14,8 +14,8 @@ namespace ProceduralDungeon.Projectile
         private Vector2 direction;
         private float timeAlive = 0f;
         private Rigidbody2D rb;
-        
-        void Start()
+
+        void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
 
@@ -60,6 +60,7 @@ namespace ProceduralDungeon.Projectile
                 if (attackable != null)
                 {
                     attackable.TakeDamage(damage);
+                    Destroy(gameObject);
                 }
             }
             else if (other.gameObject.layer == LayerMask.NameToLayer("Wall"))

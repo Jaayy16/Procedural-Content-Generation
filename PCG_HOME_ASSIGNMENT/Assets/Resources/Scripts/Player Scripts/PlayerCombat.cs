@@ -27,13 +27,15 @@ namespace ProceduralDungeon.Player
             {
                 shootPoint = transform;
             }
+
+            lastAtkTime = Time.time;
         }
 
         // Update is called once per frame
         void Update()
         {
             lockedEnemy = FindClosestEnemy();
-
+            
             if (lockedEnemy != null)
             {
                 RotateTowardsEnemy(lockedEnemy);

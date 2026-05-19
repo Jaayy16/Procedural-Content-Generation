@@ -67,7 +67,7 @@ public class CameraController : MonoBehaviour
         
         PlayerController playerController = playerTransform.GetComponent<PlayerController>();
 
-        if (playerController != null)
+        if (playerController == null)
         {
             return;
         }

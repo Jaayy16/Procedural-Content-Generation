@@ -34,7 +34,7 @@ namespace ProceduralDungeon.Enemy
                 GameObject prefab = isRanged ? rangedEnemyPrefab : meleeEnemyPrefab;
                 
                 GameObject spawnedEnemy = Instantiate(prefab, spawnPos, Quaternion.identity);
-        
+
                 BaseEnemy enemyComponent = spawnedEnemy.GetComponent<BaseEnemy>();
         
                 if (enemyComponent != null)

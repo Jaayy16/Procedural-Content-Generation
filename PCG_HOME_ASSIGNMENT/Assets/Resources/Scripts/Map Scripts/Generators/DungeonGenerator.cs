@@ -130,8 +130,9 @@ namespace ProceduralDungeon.Generator
         private List<Room> generatedRooms = new List<Room>();
         
         [Button("Generate Dungeon")]
-        public void GenerateDungeon()
+        public void GenerateDungeon(int? customSeed = null)
         {
+            int seedToUse = customSeed ?? dungeonSettings.Seed;
             
             floorTileMap.ClearAllTiles();
             wallTileMap.ClearAllTiles();
@@ -140,8 +141,8 @@ namespace ProceduralDungeon.Generator
             portalTileMap.ClearAllTiles();
             biomeTileMap.ClearAllTiles();
 
-            varianceGenerator = new TileVarianceGenerator(dungeonSettings, dungeonSettings.Seed);
-            biomeGenerator = new BiomeGenerator(dungeonSettings, dungeonSettings.Seed);
+            varianceGenerator = new TileVarianceGenerator(dungeonSettings, seedToUse);
+            biomeGenerator = new BiomeGenerator(dungeonSettings, seedToUse);
             
             generatedRooms = GenerateRooms();
             Debug.Log($"Generated {generatedRooms.Count} rooms");
@@ -163,7 +164,22 @@ namespace ProceduralDungeon.Generator
             }
             
             GenerateDecorations(generatedRooms, tileData);
+
+            CornerTileGenerator cornerTileGenerator = new CornerTileGenerator(dungeonSettings);
+            cornerTileGenerator.GenerateCornerTiles(generatedRooms, wallTileMap);
+
+            if (dungeonSettings.EnableBiomes)
+            {
+                ContextualPropGenerator propGenerator = new ContextualPropGenerator(dungeonSettings, seedToUse);
+                propGenerator.GenerateContextualProps(generatedRooms, biomeTileMap, decorationTileMap, biomeGenerator, tileData);
+            }
             
+            TrapGenerator trapGenerator = new TrapGenerator(dungeonSettings, seedToUse);
+            trapGenerator.GenerateTraps(generatedRooms, floorTileMap, trapTileMap, tileData);
+            
+            ChestGenerator chestGenerator = new ChestGenerator(dungeonSettings, seedToUse);
+            chestGenerator.GenerateChestsInDungeon(generatedRooms, floorTileMap, dungeonSettings.ChestPrefab, tileData);
+
         }
 
         [Button("Reset Dungeon")]
@@ -388,6 +404,16 @@ namespace ProceduralDungeon.Generator
                 biomeGenerator.BlendCorridorBiome(biome1, biome2, biomeTileMap, endRoom.x, endRoom.x, yMin, yMax,
                     corridorRNG);
             }
+        }
+
+        public BiomeType GetBiome(int roomIndex)
+        {
+            if (biomeGenerator != null)
+            {
+                return biomeGenerator.GetBiome(roomIndex);
+            }
+
+            return BiomeType.Normal;
         }
         
         //Generates the decorations

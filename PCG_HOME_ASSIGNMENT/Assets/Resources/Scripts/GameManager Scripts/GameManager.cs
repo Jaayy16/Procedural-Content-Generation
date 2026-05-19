@@ -4,6 +4,7 @@ using ProceduralDungeon.Combat;
 using ProceduralDungeon.Enemy;
 using UnityEngine;
 using ProceduralDungeon.Generator;
+using ProceduralDungeon.Items;
 using ProceduralDungeon.Settings;
 using UnityEngine.Tilemaps;
 using ProceduralDungeon.Player;
@@ -24,13 +25,25 @@ public class GameManager : MonoBehaviour
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private DungeonSettings dungeonSettings;
     
-    // delete this later
+    [SerializeField] private ItemManager itemManager;
 
+    
     void Start()
     {
+        if (itemManager == null)
+        {
+            itemManager = FindObjectOfType<ItemManager>();
+        }
+
+        if (itemManager == null)
+        {
+            GameObject itemManagerObj = new GameObject("ItemManager");
+            itemManager = itemManagerObj.AddComponent<ItemManager>();
+        }
+        
         if (dungeonGenerator != null)
         {
-            dungeonGenerator.GenerateDungeon();
+            dungeonGenerator.GenerateDungeon(dungeonSettings.Seed);
         
             SpawnEnemiesInRooms();
         }
@@ -129,6 +142,9 @@ public class GameManager : MonoBehaviour
         if (playerController != null)
         {
             playerController.SetTilemaps(floorTilemap, wallTilemap, decorationTilemap, portalTileMap, biomeTileMap);
+            playerController.SetDungeonGenerator(dungeonGenerator);
+            playerController.SetTrapTiles(dungeonSettings.TrapTiles);
+            playerController.SetGameManager(this);
         }
         else
         {
@@ -178,4 +194,65 @@ public class GameManager : MonoBehaviour
         }
             
     }
+
+    public void GenerateNewDungeon(int? customSeed = null)
+    {
+        Debug.Log("Generating new dungeon");
+        
+        int currentSeed = dungeonSettings.Seed;
+        int newSeed;
+
+        do
+        {
+            newSeed = Random.Range(0, 1000000);
+        }while (newSeed == currentSeed);
+
+        dungeonSettings.SetSeed(newSeed);
+        
+        if (enemySpawner != null)
+        {
+            dungeonGenerator.ResetDungeon();
+        }
+
+        if (dungeonGenerator != null)
+        {
+            dungeonGenerator.ResetDungeon();
+        }
+
+        if (dungeonGenerator != null)
+        {
+            dungeonGenerator.GenerateDungeon();
+            SpawnEnemiesInRooms();
+        }
+
+        TeleportPlayerToSpawn();
+    }
+
+    private void TeleportPlayerToSpawn()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+        if (player == null || portalTileMap == null || dungeonGenerator == null)
+        {
+            return;
+        }
+        
+        BoundsInt bounds = portalTileMap.cellBounds;
+
+        foreach (Vector3Int pos in bounds.allPositionsWithin)
+        {
+            TileBase tile = portalTileMap.GetTile(pos);
+
+            if (tile == dungeonSettings.SpawnTile)
+            {
+                Vector3 spawnPos = portalTileMap.CellToWorld(pos) + new Vector3(0.5f, 0.5f, 0f);
+                player.transform.position = spawnPos;
+
+                return;
+            }
+        }
+        
+        Debug.LogError("No Spawn tile found!");
+    }
+
 }

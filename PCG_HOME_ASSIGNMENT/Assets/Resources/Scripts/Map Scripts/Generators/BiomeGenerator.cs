@@ -13,7 +13,7 @@ namespace ProceduralDungeon.Generator
         Molten
     }
     
-    public class BiomeGenerator : MonoBehaviour
+    public class BiomeGenerator
     {
         private DungeonSettings dungeonSettings;
         private int seed;
