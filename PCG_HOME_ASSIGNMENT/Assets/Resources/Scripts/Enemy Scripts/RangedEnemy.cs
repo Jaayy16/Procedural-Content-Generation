@@ -13,12 +13,9 @@ namespace ProceduralDungeon.Enemy
         [SerializeField] private float projectileSpeed = 10f;
         [SerializeField] private float projectileDamage = 8f;
         [SerializeField] private float preferredDistance = 5f;
+        [SerializeField] private new float moveSpeed = 3f;
+        [SerializeField] private new float maxHealth = 20f;
 
-        [Header("Difficulty Scaling")]
-        [SerializeField] private float baseDamage = 3f;
-        [SerializeField] private float baseSpeed = 1.5f;
-        [SerializeField] private float baseHealth = 15f;
-        
         private float lastShotTime = 0f;
 
         protected override void OnEnable()

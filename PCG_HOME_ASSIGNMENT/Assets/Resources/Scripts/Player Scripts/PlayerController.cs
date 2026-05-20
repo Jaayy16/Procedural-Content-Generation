@@ -38,9 +38,13 @@ namespace ProceduralDungeon.Player
 
         [SerializeField] private TileBase[] lavaTiles;
 
-        [Header("Lava Settings")] [SerializeField, Range(0, 5)]
-        private float lavaDmgPerSecond = 1f;
+        [Header("Lava Settings")] 
+        [SerializeField] private float lavaDmgPerSecond = 10f;
+        [SerializeField] private float lavaSlowFactor = 0.25f;
 
+        [Header("Water Settings")] 
+        [SerializeField] private float waterSlowFactor = 0.7f;
+        
         [SerializeField] private float gridCellSize = 1f;
 
         private Vector2 inputDirection;
@@ -49,7 +53,8 @@ namespace ProceduralDungeon.Player
 
         private bool isOnWater = false;
         private bool isOnLava = false;
-        private float lavaDmgTimer = 0f;
+        private float lavaDmgCooldown = 0f;
+        
         private BiomeType currentBiome = BiomeType.Normal;
 
         private float playerHealth = 100f;
@@ -100,8 +105,11 @@ namespace ProceduralDungeon.Player
         {
             if (rb == null) return;
 
+            if (isOnLava) movementSpeed *= lavaSlowFactor;
+            if (isOnWater) movementSpeed *= waterSlowFactor;
+            
             Vector2 dir = rb.position + inputDirection * movementSpeed * Time.fixedDeltaTime;
-
+            
             if (CanMoveTo(dir))
             {
                 rb.linearVelocity = inputDirection * GetCurrentSpeed();
@@ -177,7 +185,7 @@ namespace ProceduralDungeon.Player
                   Debug.Log("No GameManager found");
               }
         }
-
+        
         //Applies water slowness
         private void CheckWaterStatus()
         {
@@ -191,6 +199,7 @@ namespace ProceduralDungeon.Player
                 if (tile != null && IsWaterTile(tile))
                 {
                     isOnWater = true;
+                    movementSpeed *= lavaSlowFactor;
                     return;
                 }
             }
@@ -245,16 +254,16 @@ namespace ProceduralDungeon.Player
         {
             if (!isOnLava)
             {
-                lavaDmgTimer = 0f;
                 return;
             }
 
-            lavaDmgTimer += Time.fixedDeltaTime;
+            lavaDmgCooldown -= Time.deltaTime;
 
-            if (lavaDmgTimer >= 1f)
+            if (lavaDmgCooldown <= 0f)
             {
-                playerHealth -= lavaDmgPerSecond;
-                lavaDmgTimer = 0f;
+                movementSpeed *= lavaSlowFactor;
+                TakeDamage(lavaDmgPerSecond);
+                lavaDmgCooldown = 1f;
                 Debug.Log($"Player too DMG! Health: {playerHealth}");
 
                 if (playerHealth <= 0)
@@ -279,8 +288,9 @@ namespace ProceduralDungeon.Player
         {
             Debug.Log("Player Died");
 
+            SceneManager.LoadScene("DeathScene");
             Destroy(this.gameObject);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
         }
 
         private void UpdateBiomeStatus()

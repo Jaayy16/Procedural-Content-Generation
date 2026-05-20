@@ -5,15 +5,12 @@ namespace ProceduralDungeon.Enemy
 {
     public class MeleeEnemy : BaseEnemy
     {
-        [Header("Melee Attack Settings")]
+        [Header("Melee Settings")]
         [SerializeField] protected float atkDamage = 15f;
         [SerializeField] protected float atkRange = 0.8f;
         [SerializeField] protected float atkCooldown = 1f;
-        
-        [Header("Difficulty Scaling")]
-        [SerializeField] private float baseDamage = 5f;
-        [SerializeField] private float baseSpeed = 2f;
-        [SerializeField] private float baseHealth = 20f;
+        [SerializeField] private new float moveSpeed = 5f;
+        [SerializeField] private new float maxHealth = 40f;
 
         
         private float lastAtkTime = 0f;

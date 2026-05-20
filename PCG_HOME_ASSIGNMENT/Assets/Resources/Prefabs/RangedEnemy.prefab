@@ -80,10 +80,10 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Sprite: {fileID: 21300000, guid: bb35ac05a9389ea41b38f5fbdd421b1a, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
-  m_FlipY: 0
+  m_FlipY: 1
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
@@ -128,8 +128,8 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.28866667}
-    oldSize: {x: 1, y: 1}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 3.2, y: 3.2}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -182,6 +182,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 40
   moveSpeed: 3
+  damage: 4
   keyPrefab: {fileID: 4169735898061699633, guid: 03aea47c9b362554ba4409a94d1a5275, type: 3}
   keyDropChance: 0.3
   projectilePrefab: {fileID: 7832230423321154636, guid: fed6a5522b8dd1046b20b6c0f0add101, type: 3}
@@ -190,6 +191,8 @@ MonoBehaviour:
   projectileSpeed: 10
   projectileDamage: 8
   preferredDistance: 5
+  moveSpeed: 3
+  maxHealth: 40
 --- !u!114 &-7742584078429810824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,7 +205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c14ee4c9a0278a247b11e764d4dff4b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRadius: 5
+  detectionRadius: 6
   playerLayer:
     serializedVersion: 2
     m_Bits: 512

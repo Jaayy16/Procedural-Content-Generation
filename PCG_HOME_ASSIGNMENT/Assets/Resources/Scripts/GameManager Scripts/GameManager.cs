@@ -34,6 +34,9 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        
+        Random.InitState(dungeonSettings.Seed);
+        
         if (difficultyManager == null)
         {
             difficultyManager = GetDifficultyManager();
@@ -227,6 +230,24 @@ public class GameManager : MonoBehaviour
 
     public void GenerateNewDungeon(int? customSeed = null)
     {
+        BaseEnemy[] allEnemies = UnityEngine.Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
+        foreach (BaseEnemy enemy in allEnemies)
+        {
+            Destroy(enemy.gameObject);
+        }
+        
+        Key[] allKeys = UnityEngine.Object.FindObjectsByType<Key>(FindObjectsSortMode.None);
+        foreach (Key key in allKeys)
+        {
+            Destroy(key.gameObject);
+        }
+        
+        Chest[] allChests = UnityEngine.Object.FindObjectsByType<Chest>(FindObjectsSortMode.None);
+        foreach (Chest chest in allChests)
+        {
+            Destroy(chest.gameObject);
+        }
+        
         Debug.Log("Generating new dungeon");
 
         if (difficultyManager != null)
@@ -243,7 +264,8 @@ public class GameManager : MonoBehaviour
         } while (newSeed == currentSeed);
 
         dungeonSettings.SetSeed(newSeed);
-
+        Random.InitState(newSeed);
+        
         if (enemySpawner != null)
         {
             dungeonGenerator.ResetDungeon();

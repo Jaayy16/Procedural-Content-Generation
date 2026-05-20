@@ -3,6 +3,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using NUnit.Framework;
 using ProceduralDungeon.Combat;
+using ProceduralDungeon.Enemy;
+using ProceduralDungeon.Items;
 using ProceduralDungeon.Settings;
 using Sirenix.OdinInspector;
 using UnityEngine.Serialization;
@@ -178,7 +180,7 @@ namespace ProceduralDungeon.Generator
             if (dungeonSettings.EnableVegetation)
             {
                 vegetationGenerator = new VegitationGenerator(dungeonSettings, seedToUse, biomeGenerator);
-                vegetationGenerator.InitializeVeg(generatedRooms, decorationTileMap, biomeTileMap, tileData);
+                vegetationGenerator.InitializeVeg(generatedRooms, floorTileMap, biomeTileMap, tileData);
 
                 if (vegetationRenderer == null)
                 {
@@ -219,6 +221,25 @@ namespace ProceduralDungeon.Generator
                 trapTileMap.ClearAllTiles();
                 portalTileMap.ClearAllTiles();
                 biomeTileMap.ClearAllTiles();
+                
+                BaseEnemy[] allEnemies = UnityEngine.Object.FindObjectsByType<BaseEnemy>(FindObjectsSortMode.None);
+                foreach (BaseEnemy enemy in allEnemies)
+                {
+                    Destroy(enemy.gameObject);
+                }
+        
+                Key[] allKeys = UnityEngine.Object.FindObjectsByType<Key>(FindObjectsSortMode.None);
+                foreach (Key key in allKeys)
+                {
+                    Destroy(key.gameObject);
+                }
+        
+                Chest[] allChests = UnityEngine.Object.FindObjectsByType<Chest>(FindObjectsSortMode.None);
+                foreach (Chest chest in allChests)
+                {
+                    Destroy(chest.gameObject);
+                }
+                
             }
             else
             {

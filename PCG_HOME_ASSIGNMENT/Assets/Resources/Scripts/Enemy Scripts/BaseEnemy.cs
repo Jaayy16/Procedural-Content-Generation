@@ -12,11 +12,6 @@ namespace ProceduralDungeon.Enemy
         
         [SerializeField] private GameObject keyPrefab;
         [SerializeField] private float keyDropChance = 0.3f;
-        
-        [Header("Difficulty Scaling")]
-        [SerializeField] private float baseDamage = 5f;
-        [SerializeField] private float baseSpeed = 2f;
-        [SerializeField] private float baseHealth = 20f;
 
         private float scaledHealth;
         private float scaledSpeed;
@@ -74,10 +69,10 @@ namespace ProceduralDungeon.Enemy
             {
                 float multiplier = difficultyMgr.GetDifficultyMultiplier();
                 
-                maxHealth = baseHealth * multiplier;
+                maxHealth = maxHealth * multiplier;
                 currentHealth = maxHealth;
-                damage = baseDamage * multiplier;
-                moveSpeed  = baseSpeed * multiplier;
+                damage = damage * multiplier;
+                moveSpeed  = moveSpeed * multiplier;
             }
         }
         

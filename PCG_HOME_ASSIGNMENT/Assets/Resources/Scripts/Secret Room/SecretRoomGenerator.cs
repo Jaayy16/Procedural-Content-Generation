@@ -18,7 +18,7 @@ namespace ProceduralDungeon.Generator
             Seed = randSeed;
         }
         
-        public void GenerateSecretRoomsEntrance(List<DungeonGenerator.Room> rooms, Tilemap wallTileMap, Tilemap floorTileMap, bool[,] wallData)
+        public void GenerateSecretRoomsEntrance(List<DungeonGenerator.Room> rooms, Tilemap wallTileMap, Tilemap decorationTilemap, bool[,] wallData)
         {
             if (!dungeonSettings.EnableSecretRoom || dungeonSettings.SecretRoomEntranceTile == null)
             {
@@ -65,7 +65,8 @@ namespace ProceduralDungeon.Generator
                     Vector3Int entrancePos = validEntranceSpots[randomIndex];
                     validEntranceSpots.RemoveAt(randomIndex);
                     
-                    wallTileMap.SetTile(entrancePos, dungeonSettings.SecretRoomEntranceTile);
+                    wallTileMap.SetTile(entrancePos, null);
+                    decorationTilemap.SetTile(entrancePos, dungeonSettings.SecretRoomEntranceTile);
                     
                     SecretRoomData secretRoom = new SecretRoomData(entrancePos, dungeonSettings.SecretRoomEntranceTile);
                     

@@ -81,8 +81,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0, g: 0, b: 1, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 12df0167b47af6b41a8c2b4b7beb1506, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -157,7 +157,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 3.2, y: 3.2}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -177,6 +177,74 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8403222aabe34174eab1748c75650d79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  dungeonGenerator: {fileID: 0}
+  dungeonSettings:
+    dungeonWidth: 80
+    dungeonHeight: 60
+    minRoomWidth: 5
+    maxRoomWidth: 15
+    minRoomHeight: 5
+    maxRoomHeight: 20
+    maxRooms: 20
+    roomSpacing: 10
+    corridorWidth: 5
+    enableVegetation: 1
+    mossTiles:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    vineTiles:
+    - {fileID: 0}
+    - {fileID: 0}
+    - {fileID: 0}
+    chestPrefab: {fileID: 0}
+    enableTraps: 1
+    trapChance: 0.1
+    trapTiles:
+    - {fileID: 0}
+    trapDamage: 15
+    trapCooldown: 2
+    enableDecoration: 1
+    spawnChance: 0.15
+    minDistFromCentre: 2
+    decorationChance: 0.15
+    seed: 12345
+    enableFloorVariance: 1
+    enableWallVariance: 1
+    noiseScale: 1
+    floorVariants:
+    - {fileID: 0}
+    wallVariants:
+    - {fileID: 0}
+    varianceThreshold: 0.5
+    enableContextualTiling: 1
+    cornerTile: {fileID: 0}
+    enableContextualProps: 1
+    floodedProps:
+    - {fileID: 0}
+    moltenProps:
+    - {fileID: 0}
+    contextualPropChance: 0.2
+    enableBiomes: 1
+    floodChance: 0.4
+    moltenChance: 0.3
+    floodedTiles:
+    - {fileID: 0}
+    moltenTiles:
+    - {fileID: 0}
+    enableSecretRoom: 1
+    maxSecretRooms: 2
+    secretRoomEntranceTile: {fileID: 0}
+    secretRoomChance: 0.3
+    wallTile: {fileID: 0}
+    floorTile: {fileID: 0}
+    trapTile:
+    - {fileID: 0}
+    decorationTiles:
+    - {fileID: 0}
+    spawnTile: {fileID: 0}
+    levelExitTile: {fileID: 0}
+  gameManager: {fileID: 0}
   movementSpeed: 20
   waterSlowMultiplier: 0.5
   wallTilemap: {fileID: 0}
@@ -184,6 +252,8 @@ MonoBehaviour:
   decorationTilemap: {fileID: 0}
   portalTilemap: {fileID: 0}
   biomeTileMap: {fileID: 0}
+  trapTileMap: {fileID: 0}
+  trapTiles: []
   waterTiles:
   - {fileID: 11400000, guid: 345a1ac6ec0095a47a0f9c3e9eb7d4c7, type: 2}
   - {fileID: 11400000, guid: 02192ec0af27a404e9037c4b4dfc4e8a, type: 2}
@@ -209,6 +279,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9a698687994e2a54e853e605c78dc93d, type: 2}
   - {fileID: 11400000, guid: fd2ce1c88b0b81a49b1cecbb479c8244, type: 2}
   lavaDmgPerSecond: 5
+  lavaSlowFactor: 0.25
+  waterSlowFactor: 0.7
   gridCellSize: 1
 --- !u!114 &-5827481219439471076
 MonoBehaviour:
